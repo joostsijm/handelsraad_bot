@@ -1,0 +1,6 @@
+tests/cassettes/
+__pycache__/
+*.egg-info/
+.env
+*.log
+*.pyc
