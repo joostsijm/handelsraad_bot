@@ -13,9 +13,9 @@ python-telegram-bot = "*"
 python-dotenv = "*"
 psycopg2-binary = "*"
 SQLAlchemy = "*"
-sqlalchemy-migrate = "*"
 appdirs = "*"
 pathlib2 = "*"
+alembic = "*"
 
 [requires]
 python_version = "3"

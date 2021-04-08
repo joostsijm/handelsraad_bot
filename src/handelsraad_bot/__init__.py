@@ -12,12 +12,28 @@ from appdirs import user_data_dir
 from dotenv import load_dotenv
 import telegram
 from telegram.ext import Updater
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from apscheduler.schedulers.background import BackgroundScheduler
 
 
 load_dotenv()
 
-DATA_DIR = user_data_dir('rival_regions_wrapper', 'bergc')
+# data directory
+DATA_DIR = user_data_dir('handelsraad_bot', 'bergc')
 pathlib2.Path(DATA_DIR).mkdir(parents=True, exist_ok=True)
+
+# database
+ENGINE = create_engine(os.environ["DATABASE_URI"], client_encoding='utf8')
+SESSION = sessionmaker(bind=ENGINE)
+
+# scheduler
+SCHEDULER = BackgroundScheduler(
+    daemon=True,
+    job_defaults={'misfire_grace_time': 5*60},
+    max_instances=5,
+)
+SCHEDULER.start()
 
 # get logger
 LOGGER = logging.getLogger(__name__)
