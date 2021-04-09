@@ -41,6 +41,8 @@ def run():
             CommandHandler('transactions', transaction.cmd_transactions)
         )
 
+    dispatcher.add_handler(transaction.conf_add_transaction)
+
 
     TELEGRAM_UPDATER.start_polling()
     TELEGRAM_UPDATER.idle()
