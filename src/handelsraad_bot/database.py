@@ -1,7 +1,9 @@
 """Database"""
 
+from sqlalchemy.orm import joinedload
+
 from handelsraad_bot import SESSION
-from handelsraad_bot.models import TransactionDetail, Limit
+from handelsraad_bot.models import Transaction, TransactionDetail, Limit
 
 
 def get_totals():
@@ -13,6 +15,7 @@ def get_totals():
         if detail.item_id not in totals:
             totals[detail.item_id] = 0
         totals[detail.item_id] += detail.amount
+    session.close()
     return totals
 
 def get_limits():
@@ -21,6 +24,7 @@ def get_limits():
     limits = {}
     for limit in session.query(Limit).all():
         limits[limit.item_id] = limit.amount
+    session.close()
     return limits
 
 def set_limit(item_id, amount):
@@ -34,6 +38,7 @@ def set_limit(item_id, amount):
         session.add(limit)
     limit.amount = amount
     session.commit()
+    session.close()
 
 def remove_limit(item_id):
     """Remove limit"""
@@ -43,3 +48,12 @@ def remove_limit(item_id):
     if limit:
         session.delete(limit)
         session.commit()
+
+def get_transactions(limit=5):
+    """Get transactions"""
+    session = SESSION()
+    transactions = session.query(Transaction).options(
+            joinedload('details')
+        ).limit(limit).all()
+    session.close()
+    return transactions

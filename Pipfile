@@ -16,6 +16,7 @@ SQLAlchemy = "*"
 appdirs = "*"
 pathlib2 = "*"
 alembic = "*"
+rival-regions-calc = "*"
 
 [requires]
 python_version = "3"

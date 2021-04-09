@@ -53,7 +53,7 @@ class TransactionDetail(Base):
     amount = db.Column(db.BigInteger, nullable=False)
     transaction_id = db.Column(db.Integer, db.ForeignKey('transaction.id'), nullable=False)
     transaction = relationship(
-        'Transaction', backref=backref('transaction_details', lazy='dynamic')
+        'Transaction', backref=backref('details')
     )
 
 

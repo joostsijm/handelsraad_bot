@@ -1,4 +1,4 @@
-"""Telegram limit commands """
+"""Telegram limit commands"""
 
 #pylint: disable=unused-argument
 

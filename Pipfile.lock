@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "d8f0e1bf01166571b84c2b16da7726740c4203b63bcbee35c20d6f0bdb090b31"
+            "sha256": "d60358b7e5abb3fde3ec2adbbb8474af2999a562587b9af58c687385fdd0aac6"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -251,6 +251,14 @@
                 "sha256:eb10ce3e7736052ed3623d49975ce333bcd712c7bb19a58b9e2089d4057d0798"
             ],
             "version": "==2021.1"
+        },
+        "rival-regions-calc": {
+            "hashes": [
+                "sha256:05583028dbcaa92b78f943e12a5a988a55ae7fa74beef4a5ffec57b4589e1ccf",
+                "sha256:dfac73602c532a88f467952996738133e97deb0664472c690b8db736940bc01d"
+            ],
+            "index": "pypi",
+            "version": "==1.1.1"
         },
         "six": {
             "hashes": [
