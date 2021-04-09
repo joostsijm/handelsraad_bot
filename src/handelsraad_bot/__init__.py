@@ -67,18 +67,22 @@ TELEGRAM_UPDATER = Updater(TELEGRAM_KEY, use_context=True)
 TELEGRAM_GROUP = int(os.environ['TELEGRAM_GROUP'])
 
 # misc
-STATE_ITEMS = {
-        'gold': 1000,
-        'oil': 1003,
-        'ore': 1004,
-        'uranium': 1011,
-        'diamond': 1015,
+ITEMS = {
+        'money':      0,
+        'state cash': 1,
+        'gold':       2,
+        'oil':        3,
+        'ore':        4,
+        'uranium':    11,
+        'diamond':    15,
     }
 
-STATE_ITEMS_INV  = {
-        1000: 'gold',
-        1003: 'oil',
-        1004: 'ore',
-        1011: 'uranium',
-        1015: 'diamond',
+ITEMS_INV  = {
+        0:  'money',
+        1:  'state cash',
+        2:  'gold',
+        3:  'oil',
+        4:  'ore',
+        11: 'uranium',
+        15: 'diamond',
     }

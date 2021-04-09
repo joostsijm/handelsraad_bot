@@ -6,8 +6,7 @@ from telegram import ParseMode
 
 from rival_regions_calc import Value
 
-from handelsraad_bot import LOGGER, STATE_ITEMS, \
-        STATE_ITEMS_INV, database
+from handelsraad_bot import LOGGER, ITEMS_INV, database
 
 
 def cmd_transactions(update, context):
@@ -25,7 +24,7 @@ def cmd_transactions(update, context):
         for detail in transaction.details:
             transactions_msgs.append(
                     '{:8}: {} $ {}'.format(
-                            STATE_ITEMS_INV[detail.item_id],
+                            ITEMS_INV[detail.item_id],
                             Value(detail.amount),
                             Value(detail.money),
                         )

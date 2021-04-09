@@ -4,7 +4,9 @@
 
 from telegram import ParseMode
 
-from handelsraad_bot import LOGGER, STATE_ITEMS_INV, database
+from rival_regions_calc import Value
+
+from handelsraad_bot import LOGGER, ITEMS_INV, database
 
 
 def cmd_start(update, context):
@@ -21,12 +23,15 @@ def cmd_help(update, context):
 def cmd_total(update, context):
     """Total command"""
     LOGGER.info('%s: CMD total', update.message.chat.username)
-    totals = database.get_totals()
-    totals_msgs = ['**Total**']
-    for resource_id, total in totals.items():
-        totals_msgs.append('{:8}, {}'.format(
-                STATE_ITEMS_INV[resource_id], total)
+    total = database.get_total()
+    total_msgs = ['**Total**']
+    for resource_id, total in total.items():
+        total_msgs.append(
+                '{:8}, {}'.format(
+                        ITEMS_INV[resource_id],
+                        Value(total)
+                    )
             )
     update.message.reply_text(
-            '\n'.join(totals_msgs), parse_mode=ParseMode.MARKDOWN
+            '\n'.join(total_msgs), parse_mode=ParseMode.MARKDOWN
         )

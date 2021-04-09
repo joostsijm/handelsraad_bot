@@ -4,8 +4,8 @@
 
 from telegram import ParseMode
 
-from handelsraad_bot import LOGGER, STATE_ITEMS, \
-        STATE_ITEMS_INV, database
+from handelsraad_bot import LOGGER, ITEMS, \
+        ITEMS_INV, database
 
 
 def cmd_limits(update, context):
@@ -15,7 +15,7 @@ def cmd_limits(update, context):
     limits_msgs = ['**Limits:**']
     for resource_id, limit in limits.items():
         limits_msgs.append('{:8}: {}'.format(
-                STATE_ITEMS_INV[resource_id], limit)
+                ITEMS_INV[resource_id], limit)
             )
     if not limits:
         limits_msgs.append('no limits')
@@ -36,7 +36,7 @@ def cmd_set(update, context):
         return
 
     try:
-        item_id = STATE_ITEMS[item_name]
+        item_id = ITEMS[item_name]
     except IndexError:
         LOGGER.info('Item name not found')
         update.message.reply_text('/set_limit <item_name> <amount>')
@@ -79,7 +79,7 @@ def cmd_remove(update, context):
         return
 
     try:
-        item_id = STATE_ITEMS[item_name]
+        item_id = ITEMS[item_name]
     except IndexError:
         LOGGER.info('Item name not found')
         update.message.reply_text('/remove_limit <item_name>')

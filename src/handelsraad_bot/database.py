@@ -1,22 +1,29 @@
 """Database"""
 
+# pylint: disable=singleton-comparison
+
 from sqlalchemy.orm import joinedload
 
 from handelsraad_bot import SESSION
-from handelsraad_bot.models import Transaction, TransactionDetail, Limit
+from handelsraad_bot.models import User, Transaction, TransactionDetail, Limit
 
 
-def get_totals():
-    """Get totals"""
+def get_total():
+    """Get total"""
     session = SESSION()
-    totals = {}
+    total = {
+            0: 0,
+        }
+    for user in session.query(User).filter(User.investment != None).all():
+        total[0] += user.investment
     transaction_details = session.query(TransactionDetail).all()
     for detail in transaction_details:
-        if detail.item_id not in totals:
-            totals[detail.item_id] = 0
-        totals[detail.item_id] += detail.amount
+        if detail.item_id not in total:
+            total[detail.item_id] = 0
+        total[detail.item_id] += detail.amount
+        total[0] += detail.money
     session.close()
-    return totals
+    return total
 
 def get_limits():
     """Get limits"""
