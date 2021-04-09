@@ -1,46 +1,24 @@
-"""Telegram bot"""
+"""Telegram limit commands """
 
 #pylint: disable=unused-argument
 
 from telegram import ParseMode
-from telegram.ext import CommandHandler
 
-from handelsraad_bot import LOGGER, TELEGRAM_UPDATER, STATE_ITEMS, \
+from handelsraad_bot import LOGGER, STATE_ITEMS, \
         STATE_ITEMS_INV, database
-
-
-def cmd_start(update, context):
-    """Start command"""
-    update.message.reply_text(
-        'Hi {}'.format(update.message.from_user.first_name))
-
-
-def cmd_help(update, context):
-    """Help command"""
-    update.message.reply_text('**HELP**', parse_mode=ParseMode.MARKDOWN)
-
-
-def cmd_total(update, context):
-    """Total command"""
-    totals = database.get_totals()
-    totals_msgs = ['**Total**']
-    for resource_id, total in totals.items():
-        totals_msgs.append('{:8}, {}'.format(
-                STATE_ITEMS_INV[resource_id], total)
-            )
-    update.message.reply_text(
-            '\n'.join(totals_msgs), parse_mode=ParseMode.MARKDOWN
-        )
 
 
 def cmd_limits(update, context):
     """limits command"""
+    LOGGER.info('%s: CMD limits', update.message.chat.username)
     limits = database.get_limits()
-    limits_msgs = ['**Limits**']
+    limits_msgs = ['**Limits:**']
     for resource_id, limit in limits.items():
         limits_msgs.append('{:8}: {}'.format(
                 STATE_ITEMS_INV[resource_id], limit)
             )
+    if not limits:
+        limits_msgs.append('no limits')
     update.message.reply_text(
             '\n'.join(limits_msgs), parse_mode=ParseMode.MARKDOWN
         )
@@ -48,6 +26,7 @@ def cmd_limits(update, context):
 
 def cmd_set_limit(update, context):
     """Set limit"""
+    LOGGER.info('%s: CMD set limit', update.message.chat.username)
     try:
         item_name = context.args[0]
     except IndexError:
@@ -90,6 +69,7 @@ def cmd_set_limit(update, context):
 
 def cmd_remove_limit(update, context):
     """Set limit"""
+    LOGGER.info('%s: CMD remove limit', update.message.chat.username)
     try:
         item_name = context.args[0]
     except IndexError:
@@ -112,22 +92,3 @@ def cmd_remove_limit(update, context):
             'Limit removed: {}'.format(item_name),
             parse_mode=ParseMode.MARKDOWN
         )
-
-def run():
-    """run function"""
-    LOGGER.info('starting Telegram')
-
-    dispatcher = TELEGRAM_UPDATER.dispatcher
-
-    # general commands
-    dispatcher.add_handler(CommandHandler('start', cmd_start))
-    dispatcher.add_handler(CommandHandler('help', cmd_help))
-
-    # handelsraad
-    dispatcher.add_handler(CommandHandler('total', cmd_total))
-    dispatcher.add_handler(CommandHandler('limits', cmd_limits))
-    dispatcher.add_handler(CommandHandler('set_limit', cmd_set_limit))
-    dispatcher.add_handler(CommandHandler('remove_limit', cmd_remove_limit))
-
-    TELEGRAM_UPDATER.start_polling()
-    TELEGRAM_UPDATER.idle()
