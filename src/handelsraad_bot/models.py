@@ -78,5 +78,5 @@ class Profit(Base):
     )
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     user = relationship(
-        'User', backref=backref('transactions', lazy='dynamic')
+        'User', backref=backref('profits', lazy='dynamic')
     )
