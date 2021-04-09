@@ -25,10 +25,3 @@ def pytest_cmdline_preparse(config, args):
         return
 
     _pytest.skipping.skip = no_skip
-
-
-@pytest.fixture(scope='module')
-def vcr(vcr):
-    """Set parameters vor VCR"""
-    vcr.ignore_localhost = True
-    return vcr

@@ -4,17 +4,23 @@
 import pytest
 
 from handelsraad_bot import SESSION
-from handelsraad_bot.models import Transaction, TransactionDetail
+from handelsraad_bot.models import User, Transaction, TransactionDetail
 
 
 
 @pytest.mark.skip()
-@pytest.mark.vcr()
 def test_add_transaction():
     """Test moels"""
     session = SESSION()
+    user = session.query(User).filter(User.name == 'Test').first()
+    if not user:
+        user = User()
+        user.name = 'Test'
+        user.telegram_id = '1'
+        session.add(user)
+
     transaction = Transaction()
-    transaction.creator = 'berg_jnl'
+    transaction.user  = user
     transaction.description = 'Test transaction'
     session.add(transaction)
 
