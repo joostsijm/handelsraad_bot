@@ -48,6 +48,7 @@ class TransactionDetail(Base):
     """Model for transaction detail"""
     __tablename__ = 'transaction_detail'
     id = db.Column(db.Integer, primary_key=True)
+    money = db.Column(db.BigInteger, nullable=False)
     item_id = db.Column(db.SmallInteger, nullable=False)
     amount = db.Column(db.BigInteger, nullable=False)
     transaction_id = db.Column(db.Integer, db.ForeignKey('transaction.id'), nullable=False)

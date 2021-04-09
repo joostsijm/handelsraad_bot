@@ -25,6 +25,7 @@ def test_add_transaction():
     session.add(transaction)
 
     transaction_detail = TransactionDetail()
+    transaction_detail.money = -18e8 
     transaction_detail.item_id = 1011
     transaction_detail.amount = 1e6
     transaction_detail.transaction = transaction
