@@ -31,10 +31,10 @@ def run():
             CommandHandler('limits', limit.cmd_limits)
         )
     dispatcher.add_handler(
-            CommandHandler('set_limit', limit.cmd_set_limit)
+            CommandHandler('set_limit', limit.cmd_set)
         )
     dispatcher.add_handler(
-            CommandHandler('remove_limit', limit.cmd_remove_limit)
+            CommandHandler('remove_limit', limit.cmd_remove)
         )
 
     dispatcher.add_handler(

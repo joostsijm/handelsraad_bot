@@ -24,7 +24,7 @@ def cmd_limits(update, context):
         )
 
 
-def cmd_set_limit(update, context):
+def cmd_set(update, context):
     """Set limit"""
     LOGGER.info('%s: CMD set limit', update.message.chat.username)
     try:
@@ -67,7 +67,7 @@ def cmd_set_limit(update, context):
         )
 
 
-def cmd_remove_limit(update, context):
+def cmd_remove(update, context):
     """Set limit"""
     LOGGER.info('%s: CMD remove limit', update.message.chat.username)
     try:
