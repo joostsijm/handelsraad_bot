@@ -1,18 +1,18 @@
 """Telegram transactions command"""
 
-#pylint: disable=unused-argument
+# pylint: disable=unused-argument
 
 from telegram import ParseMode
-from telegram.ext import CommandHandler, MessageHandler, Filters, ConversationHandler
+from telegram.ext import CommandHandler, MessageHandler, Filters, \
+        ConversationHandler
 
 from rival_regions_calc import Value
 
-from handelsraad_bot import LOGGER, ITEMS_INV, database
+from handelsraad_bot import LOGGER, ITEMS, ITEMS_INV, database
 
 
 def cmd_transactions(update, context):
     """transactions command"""
-    LOGGER.info('%s: CMD transactions', update.message.chat.username)
     transactions = database.get_transactions()
     transactions_msgs = ['**Transactions:**']
     for transaction in transactions:
@@ -34,34 +34,112 @@ def cmd_transactions(update, context):
             '\n'.join(transactions_msgs), parse_mode=ParseMode.MARKDOWN
         )
 
+
 TRANSACTION, CONFIRM, EDIT = range(3)
 
-def transaction_start(update, context):
+
+def conv_transaction_start(update, context):
     """Start message"""
+    LOGGER.info('%s: CMD add_transaction', update.message.chat.username)
 #    if update.message.chat.id != -293370068:
 #        update.message.reply_text(
 #                'Geen rechten om transactions te maken.' + \
 #                'Contact @bergjnl'
 #            )
 #        return ConversationHandler.END
-    update.message.reply_text('Stuur de beschrijving voor transaction:')
+    update.message.reply_text('Stuur de beschrijving voor transactie:')
     return TRANSACTION
 
-def transaction_confirm(update, context):
-    """Transaction confirm"""
-    LOGGER.info('Transaction description: "%s"', update.message.text)
+
+def conv_transaction_ask_details(update, context):
+    """Transaction ask details"""
+    LOGGER.info(
+            '%s: CMD add_transaction, description: "%s"',
+            update.message.chat.username,
+            update.message.text
+        )
     context.user_data['transaction'] = {
             'description': update.message.text,
             'details': [],
         }
     update.message.reply_text(
-        'Verstuur \'confirm\' om te plaatsen, ' + \
-            '`/edit <language>` om te bewerken, of /cancel om te stoppen.',
-        parse_mode=ParseMode.MARKDOWN
-    )
+            """Voeg transactie details toe.
+```
+/sell <item> <amount> <price_each>
+/buy <item> <amount> <price_each>
+/add <item> <amount> <money>
+```
+bijvoorbeeld:
+```
+/sell uranium 1kk 2000
+/add uranium 1kk 2kkk
+/buy oil 10kkk 190
+/add oil 10kkk -1900kkk```""",
+            parse_mode=ParseMode.MARKDOWN
+        )
     return CONFIRM
 
-def transaction_detail_remove(update, context):
+
+def conv_transaction_sell(update, context):
+    """Add sell transaction detail"""
+    try:
+        item_id = ITEMS[context.args[0]]
+    except (IndexError, KeyError):
+        LOGGER.info(
+                '%s: CMD transaction sell, incorrect item name',
+                update.message.chat.username,
+            )
+        update.message.reply_text('Probleem met item <name>.')
+        update.message.reply_text('/sell <item> <amount> <price_each>')
+        return CONFIRM
+
+    try:
+        amount = Value(context.args[1])
+    except (IndexError, ValueError):
+        LOGGER.info(
+                '%s: CMD transaction sell, incorrect amount',
+                update.message.chat.username,
+            )
+        update.message.reply_text('Probleem met <amount>.')
+        update.message.reply_text('/sell <item> <amount> <price_each>')
+        return CONFIRM
+
+    try:
+        price_each = Value(context.args[2])
+    except (IndexError, ValueError):
+        LOGGER.info(
+                '%s: CMD transaction sell, incorrect price each',
+                update.message.chat.username,
+            )
+        update.message.reply_text('Probleem met <price_each>.')
+        update.message.reply_text('/sell <item> <amount> <price_each>')
+        return CONFIRM
+
+    context.user_data['transaction']['details'].append({
+            'item_id': item_id,
+            'amount': amount,
+            'money': Value(amount * price_each),
+        })
+
+    print_transaction(update, context)
+
+    update.message.reply_text(
+            'Voeg meer details toe of sla de transactie op met `/save`.',
+            parse_mode=ParseMode.MARKDOWN
+        )
+
+    return CONFIRM
+
+
+def conv_transaction_buy(update, context):
+    """Add buy transaction detail"""
+
+
+def conv_transaction_add(update, context):
+    """Add add transaction detail"""
+
+
+def conv_transaction_detail_remove(update, context):
     """Edit language text"""
     try:
         index = int(context.args[0]) - 1
@@ -74,104 +152,107 @@ def transaction_detail_remove(update, context):
     update.message.reply_text('Transaction detail verwijderd')
     return EDIT
 
-def announcement_update(update, context):
-    """Update announcement"""
-    updated_text = demoji.replace(update.message.text, '')
-    language = context.user_data['edit']
-    context.user_data['translations'][language] = updated_text
-    return format_announcement(update, context)
 
-def announcement_send(update, context):
-    """Send announcement"""
-    LOGGER.info('Confirmed announcement:\n%s', context.user_data['announcement'])
-    if not TESTING:
-        telegram_message = BOT.send_message(
-            chat_id=TELEGRAM_ANNOUNCEMENT_CHANNEL,
-            text=context.user_data['announcement'],
-            parse_mode=ParseMode.MARKDOWN
+def conv_transaction_save(update, context):
+    """Save transaction"""
+    LOGGER.info(
+            '%s: CMD save transaction',
+            update.message.chat.username
         )
-        BOT.forward_message(
-            chat_id=VN_TELEGRAM_CHAT,
-            from_chat_id=telegram_message.chat_id,
-            message_id=telegram_message.message_id
-        )
-        webhook = DiscordWebhook(
-            url=DISCORD_ANNOUCEMENT_WEBHOOK,
-            content=context.user_data['announcement'].replace('*', '**')
-        )
-        webhook.execute()
-        requests.post(
-            '{}send_conference_message/{}'.format(PACC_URL, RR_CONFERENCE_ID),
-            headers=PACC_HEADERS,
-            data={
-                'message': context.user_data['conference_announcement']
-            }
-        )
-        requests.post(
-            '{}send_conference_notification/{}'.format(PACC_URL, RR_CONFERENCE_ID),
-            headers=PACC_HEADERS,
-            data={
-                'message': context.user_data['conference_announcement']
-            }
-        )
-    update.message.reply_text('Announcement verstuurd')
+    update.message.reply_text('Transaction opgeslagen')
     context.user_data.clear()
     return ConversationHandler.END
 
-def transaction_cancel(update, context):
+
+def conv_transaction_cancel(update, context):
     """Cancel transaction"""
     LOGGER.info(
-            'Canceled transaction: "%s"',
-            context.user_data['transaction']
+            '%s: CMD cancel transaction',
+            update.message.chat.username
         )
-    update.message.reply_text('Canceled transaction.')
+    update.message.reply_text('Transaction gecanceld.')
     context.user_data.clear()
     return ConversationHandler.END
 
+
+def print_transaction(update, context):
+    """Print transaction"""
+    index = 1
+    total_money = 0
+    transaction_msg = [
+            'Transaction omschrijving: "{}"'.format(
+                    context.user_data['transaction']['description']
+                ),
+            'Details:',
+            ]
+    for detail in context.user_data['transaction']['details']:
+        transaction_msg.append(
+                '*{}*: {}, {}, $ {}'.format(
+                        index,
+                        detail['amount'],
+                        ITEMS_INV[detail['item_id']],
+                        detail['money']
+                    )
+            )
+        index += 1
+        total_money += detail['money']
+
+    transaction_msg.append('Totaal geld: $ {}'.format(Value(total_money)))
+
+    update.message.reply_text(
+            '\n'.join(transaction_msg),
+            parse_mode=ParseMode.MARKDOWN
+        )
+
+
 # add transaction conversation
-conf_add_transaction = ConversationHandler(
+conv_add_transaction = ConversationHandler(
         entry_points=[
                 CommandHandler(
-                        'add_transation',
-                        transaction_start
+                        'add_transaction',
+                        conv_transaction_start
                     )
             ],
         states={
                 TRANSACTION: [
                         MessageHandler(
                                 Filters.text,
-                                transaction_confirm
+                                conv_transaction_ask_details
                             )
                     ],
                 CONFIRM: [
-                        MessageHandler(
+                        CommandHandler(
+                                'sell',
+                                conv_transaction_sell
+                            ),
+                        CommandHandler(
+                                'buy',
+                                conv_transaction_buy
+                            ),
+                        CommandHandler(
                                 'add',
-                                transaction_add
+                                conv_transaction_add
                             ),
-                        CommandHandler(
-                                'edit',
-                                transaction_edit
-                            ),
-                        CommandHandler(
-                                'save',
-                                transaction_save
-                            ),
-                        CommandHandler(
-                                'cancel',
-                                transaction_cancel
-                            )
+#                        CommandHandler(
+#                                'edit',
+#                                conv_transaction_edit
+#                            ),
+#                        CommandHandler(
+#                                'save',
+#                                conv_transaction_save
+#                            ),
                     ],
                 EDIT: [
-                        MessageHandler(
-                                Filters.text,
-                                transaction_update
-                            )
+#                        MessageHandler(
+#                                Filters.text,
+#                                conv_transaction_update
+#                            )
                     ]
             },
         fallbacks=[
                 CommandHandler(
                         'cancel',
-                        transaction_cancel
+                        conv_transaction_cancel
                     )
             ]
     )

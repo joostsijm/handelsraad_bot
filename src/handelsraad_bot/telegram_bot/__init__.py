@@ -1,6 +1,6 @@
 """Telegram bot"""
 
-#pylint: disable=unused-argument
+# pylint: disable=unused-argument
 
 from telegram.ext import CommandHandler
 
@@ -37,12 +37,13 @@ def run():
             CommandHandler('remove_limit', limit.cmd_remove)
         )
 
+    # transactino
     dispatcher.add_handler(
             CommandHandler('transactions', transaction.cmd_transactions)
         )
-
-    dispatcher.add_handler(transaction.conf_add_transaction)
-
+    dispatcher.add_handler(
+            transaction.conv_add_transaction
+        )
 
     TELEGRAM_UPDATER.start_polling()
     TELEGRAM_UPDATER.idle()
