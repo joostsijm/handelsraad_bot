@@ -10,6 +10,19 @@ from rival_regions_calc import Value
 from handelsraad_bot import LOGGER, ITEMS, ITEMS_INV, database
 
 
+INSTRUCTIONS = """```
+/sell <item> <amount> <price_each>
+/buy <item> <amount> <price_each>
+/add <item> <amount> <money>
+```
+bijvoorbeeld:
+```
+/sell uranium 1kk 2000
+/add uranium 1kk 2kkk
+/buy oil 10kkk 190
+/add oil 10kkk -1900kkk```"""
+
+
 def print_transaction(update, context):
     """Print transaction"""
     index = 1
@@ -19,19 +32,21 @@ def print_transaction(update, context):
                     context.user_data['transaction']['description']
                 ),
             'Details:',
+            '```',
             ]
     for detail in context.user_data['transaction']['details']:
         transaction_msg.append(
-                '*{}*: {}, {}, $ {}'.format(
+                '{}: {:>6}, {:8} $ {:>6}'.format(
                         index,
-                        detail['amount'],
+                        str(detail['amount']),
                         ITEMS_INV[detail['item_id']],
-                        detail['money']
+                        str(detail['money'])
                     )
             )
         index += 1
         total_money += detail['money']
 
+    transaction_msg.append('```')
     transaction_msg.append('Totaal geld: $ {}'.format(Value(total_money)))
 
     update.message.reply_text(
@@ -53,6 +68,7 @@ def conv_transaction_start(update, context):
 #            )
 #        return ConversationHandler.END
     update.message.reply_text('Stuur de beschrijving voor transactie:')
+
     return TRANSACTION
 
 
@@ -69,24 +85,14 @@ def conv_transaction_ask_details(update, context):
             'details': [],
         }
     update.message.reply_text(
-            """Voeg transactie details toe.
-```
-/sell <item> <amount> <price_each>
-/buy <item> <amount> <price_each>
-/add <item> <amount> <money>
-```
-bijvoorbeeld:
-```
-/sell uranium 1kk 2000
-/add uranium 1kk 2kkk
-/buy oil 10kkk 190
-/add oil 10kkk -1900kkk```""",
+            'Voeg transactie details toe.\n' + INSTRUCTIONS,
             parse_mode=ParseMode.MARKDOWN
         )
-    return CONFIRM
+
+    return DETAIL
 
 
-def conv_transaction_sell(update, context):
+def conv_transaction_detail_sell(update, context):
     """Add sell transaction detail"""
     LOGGER.info(
             '%s: CONV add_transaction, CMD sell',
@@ -99,20 +105,21 @@ def conv_transaction_sell(update, context):
                 '%s: CONV add_transaction, CMD sell, incorrect item name',
                 update.message.chat.username,
             )
-        update.message.reply_text('Probleem met item <name>.')
+        update.message.reply_text('Probleem met <name>.')
         update.message.reply_text('/sell <item> <amount> <price_each>')
-        return CONFIRM
+        return DETAIL
 
     try:
         amount = Value(context.args[1])
-    except (IndexError, ValueError):
+    except (IndexError, ValueError) as e:
+        print(e)
         LOGGER.warning(
                 '%s: CONV add_transaction, CMD sell, incorrect amount',
                 update.message.chat.username,
             )
         update.message.reply_text('Probleem met <amount>.')
         update.message.reply_text('/sell <item> <amount> <price_each>')
-        return CONFIRM
+        return DETAIL
 
     try:
         price_each = Value(context.args[2])
@@ -123,7 +130,7 @@ def conv_transaction_sell(update, context):
             )
         update.message.reply_text('Probleem met <price_each>.')
         update.message.reply_text('/sell <item> <amount> <price_each>')
-        return CONFIRM
+        return DETAIL
 
     context.user_data['transaction']['details'].append({
             'item_id': item_id,
@@ -134,33 +141,53 @@ def conv_transaction_sell(update, context):
     print_transaction(update, context)
 
     update.message.reply_text(
-            'Voeg meer details toe of sla de transactie op met `/save`.',
+            'Voeg meer details toe '
+            'of verwijder details met: `/remove <index>`. '
+            'Sla de transactie op met: `/save`.',
             parse_mode=ParseMode.MARKDOWN
         )
 
-    return CONFIRM
+    return DETAIL
 
 
-def conv_transaction_buy(update, context):
+def conv_transaction_detail_buy(update, context):
     """Add buy transaction detail"""
 
 
-def conv_transaction_add(update, context):
-    """Add add transaction detail"""
+def conv_transaction_detail_add(update, context):
+    """Add transaction detail"""
 
 
 def conv_transaction_detail_remove(update, context):
-    """Edit language text"""
+    """Remove transaction detail"""
     try:
         index = int(context.args[0]) - 1
     except IndexError:
         update.message.reply_text(
-                'geeft detail detail nummer te verwijderen.'
+                'geeft detail nummer te verwijderen '
+                'met: `/remove <index>`.',
+                parse_mode=ParseMode.MARKDOWN
             )
-    context.user_data['transaction']['details'].pop(index)
+        return DETAIL
 
-    update.message.reply_text('Transaction detail verwijderd')
-    return EDIT
+    try:
+        context.user_data['transaction']['details'].pop(index)
+    except IndexError:
+        update.message.reply_text(
+                'Sorry, die index bestaat niet.'
+            )
+        return DETAIL
+
+    update.message.reply_text(
+            'Transactie detail verwijderd. '
+            'Voeg meer details toe '
+            'of verwijder details met: `/remove <index>`. '
+            'Sla de transactie op met: `/save`.',
+            parse_mode=ParseMode.MARKDOWN
+        )
+    print_transaction(update, context)
+
+    return DETAIL
 
 
 def conv_transaction_save(update, context):
@@ -170,10 +197,19 @@ def conv_transaction_save(update, context):
             update.message.chat.username
         )
 
+    if len(context.user_data['transaction']['details']) == 0:
+        update.message.reply_text(
+                'Oelewapper! '
+                'Je hebt geen transactie details toegevoegd.\n' + INSTRUCTIONS,
+                parse_mode=ParseMode.MARKDOWN
+            )
+        return DETAIL
+
     database.save_transaction(context.user_data['transaction'])
 
     update.message.reply_text('Transaction opgeslagen')
     context.user_data.clear()
+
     return ConversationHandler.END
 
 
@@ -185,10 +221,11 @@ def conv_transaction_cancel(update, context):
         )
     update.message.reply_text('Transaction gecanceld.')
     context.user_data.clear()
+
     return ConversationHandler.END
 
 
-TRANSACTION, CONFIRM, EDIT = range(3)
+TRANSACTION, DETAIL = range(2)
 
 
 # add transaction conversation
@@ -206,33 +243,27 @@ conversation = ConversationHandler(
                                 conv_transaction_ask_details
                             )
                     ],
-                CONFIRM: [
+                DETAIL: [
                         CommandHandler(
                                 'sell',
-                                conv_transaction_sell
+                                conv_transaction_detail_sell
                             ),
                         CommandHandler(
                                 'buy',
-                                conv_transaction_buy
+                                conv_transaction_detail_buy
                             ),
                         CommandHandler(
                                 'add',
-                                conv_transaction_add
+                                conv_transaction_detail_add
                             ),
-#                        CommandHandler(
-#                                'edit',
-#                                conv_transaction_edit
-#                            ),
-                         CommandHandler(
-                                 'save',
-                                 conv_transaction_save
-                             ),
-                    ],
-                EDIT: [
-#                        MessageHandler(
-#                                Filters.text,
-#                                conv_transaction_update
-#                            )
+                        CommandHandler(
+                                'remove',
+                                conv_transaction_detail_remove
+                            ),
+                        CommandHandler(
+                                'save',
+                                conv_transaction_save
+                            ),
                     ]
             },
         fallbacks=[
