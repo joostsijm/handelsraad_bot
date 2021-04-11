@@ -6,7 +6,7 @@ from telegram.ext import CommandHandler
 
 from handelsraad_bot import LOGGER, TELEGRAM_UPDATER
 
-from . import general, limit, transaction
+from . import general, limit, transaction, add_transaction
 
 
 def run():
@@ -42,7 +42,7 @@ def run():
             CommandHandler('transactions', transaction.cmd_transactions)
         )
     dispatcher.add_handler(
-            transaction.conv_add_transaction
+            add_transaction.conversation
         )
 
     TELEGRAM_UPDATER.start_polling()
