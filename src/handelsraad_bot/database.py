@@ -2,6 +2,8 @@
 
 # pylint: disable=singleton-comparison
 
+from datetime import datetime
+
 from sqlalchemy.orm import joinedload
 
 from handelsraad_bot import SESSION
@@ -25,6 +27,7 @@ def get_total():
     session.close()
     return total
 
+
 def get_limits():
     """Get limits"""
     session = SESSION()
@@ -34,11 +37,11 @@ def get_limits():
     session.close()
     return limits
 
+
 def set_limit(item_id, amount):
     """Set limit"""
     session = SESSION()
-    limit = session.query(Limit) \
-            .filter(Limit.item_id == item_id).first()
+    limit = session.query(Limit).filter(Limit.item_id == item_id).first()
     if not limit:
         limit = Limit()
         limit.item_id = item_id
@@ -47,14 +50,15 @@ def set_limit(item_id, amount):
     session.commit()
     session.close()
 
+
 def remove_limit(item_id):
     """Remove limit"""
     session = SESSION()
-    limit = session.query(Limit) \
-            .filter(Limit.item_id == item_id).first()
+    limit = session.query(Limit).filter(Limit.item_id == item_id).first()
     if limit:
         session.delete(limit)
         session.commit()
+
 
 def get_transactions(limit=5):
     """Get transactions"""
@@ -64,3 +68,34 @@ def get_transactions(limit=5):
         ).limit(limit).all()
     session.close()
     return transactions
+
+
+def save_transaction(transaction_dict):
+    """Save transaction"""
+    session = SESSION()
+    user = session.query(User).filter(
+            User.telegram_id == transaction_dict['telegram_id']
+        ).first()
+    if not user:
+        user = User()
+        user.name = 'test'
+        user.telegram_id = transaction_dict['telegram_id']
+        user.trader = True
+        session.add(user)
+
+    transaction = Transaction()
+    transaction.date_time = datetime.now()
+    transaction.description = transaction_dict['description']
+    transaction.user = user
+    session.add(transaction)
+
+    for detail in transaction_dict['details']:
+        transaction_detail = TransactionDetail()
+        transaction_detail.money = detail['money']
+        transaction_detail.item_id = detail['item_id']
+        transaction_detail.amount = detail['amount']
+        transaction_detail.transaction = transaction
+        session.add(transaction_detail)
+
+    session.commit()
+    session.close()

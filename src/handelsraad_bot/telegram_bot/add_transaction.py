@@ -5,10 +5,9 @@
 from telegram import ParseMode
 from telegram.ext import CommandHandler, MessageHandler, Filters, \
         ConversationHandler
-
 from rival_regions_calc import Value
 
-from handelsraad_bot import LOGGER, ITEMS, ITEMS_INV
+from handelsraad_bot import LOGGER, ITEMS, ITEMS_INV, database
 
 
 def print_transaction(update, context):
@@ -43,7 +42,10 @@ def print_transaction(update, context):
 
 def conv_transaction_start(update, context):
     """Start message"""
-    LOGGER.info('%s: CMD add_transaction', update.message.chat.username)
+    LOGGER.info(
+            '%s: CONV add_transaction, CMD start',
+            update.message.chat.username
+        )
 #    if update.message.chat.id != -293370068:
 #        update.message.reply_text(
 #                'Geen rechten om transactions te maken.' + \
@@ -57,11 +59,12 @@ def conv_transaction_start(update, context):
 def conv_transaction_ask_details(update, context):
     """Transaction ask details"""
     LOGGER.info(
-            '%s: CMD add_transaction, description: "%s"',
+            '%s: CONV add_transaction, description: "%s"',
             update.message.chat.username,
             update.message.text
         )
     context.user_data['transaction'] = {
+            'telegram_id': update.message.chat.id,
             'description': update.message.text,
             'details': [],
         }
@@ -85,11 +88,15 @@ bijvoorbeeld:
 
 def conv_transaction_sell(update, context):
     """Add sell transaction detail"""
+    LOGGER.info(
+            '%s: CONV add_transaction, CMD sell',
+            update.message.chat.username
+        )
     try:
         item_id = ITEMS[context.args[0]]
     except (IndexError, KeyError):
-        LOGGER.info(
-                '%s: CMD transaction sell, incorrect item name',
+        LOGGER.warning(
+                '%s: CONV add_transaction, CMD sell, incorrect item name',
                 update.message.chat.username,
             )
         update.message.reply_text('Probleem met item <name>.')
@@ -99,8 +106,8 @@ def conv_transaction_sell(update, context):
     try:
         amount = Value(context.args[1])
     except (IndexError, ValueError):
-        LOGGER.info(
-                '%s: CMD transaction sell, incorrect amount',
+        LOGGER.warning(
+                '%s: CONV add_transaction, CMD sell, incorrect amount',
                 update.message.chat.username,
             )
         update.message.reply_text('Probleem met <amount>.')
@@ -110,8 +117,8 @@ def conv_transaction_sell(update, context):
     try:
         price_each = Value(context.args[2])
     except (IndexError, ValueError):
-        LOGGER.info(
-                '%s: CMD transaction sell, incorrect price each',
+        LOGGER.warning(
+                '%s: CONV add_transaction, CMD sell, incorrect price each',
                 update.message.chat.username,
             )
         update.message.reply_text('Probleem met <price_each>.')
@@ -159,9 +166,12 @@ def conv_transaction_detail_remove(update, context):
 def conv_transaction_save(update, context):
     """Save transaction"""
     LOGGER.info(
-            '%s: CMD save transaction',
+            '%s: CONV add_transaction, CMD save',
             update.message.chat.username
         )
+
+    database.save_transaction(context.user_data['transaction'])
+
     update.message.reply_text('Transaction opgeslagen')
     context.user_data.clear()
     return ConversationHandler.END
@@ -170,7 +180,7 @@ def conv_transaction_save(update, context):
 def conv_transaction_cancel(update, context):
     """Cancel transaction"""
     LOGGER.info(
-            '%s: CMD cancel transaction',
+            '%s: CONV add_transaction, CMD cancel',
             update.message.chat.username
         )
     update.message.reply_text('Transaction gecanceld.')
@@ -213,10 +223,10 @@ conversation = ConversationHandler(
 #                                'edit',
 #                                conv_transaction_edit
 #                            ),
-#                        CommandHandler(
-#                                'save',
-#                                conv_transaction_save
-#                            ),
+                         CommandHandler(
+                                 'save',
+                                 conv_transaction_save
+                             ),
                     ],
                 EDIT: [
 #                        MessageHandler(

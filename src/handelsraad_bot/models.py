@@ -51,7 +51,9 @@ class TransactionDetail(Base):
     money = db.Column(db.BigInteger, nullable=False)
     item_id = db.Column(db.SmallInteger, nullable=False)
     amount = db.Column(db.BigInteger, nullable=False)
-    transaction_id = db.Column(db.Integer, db.ForeignKey('transaction.id'), nullable=False)
+    transaction_id = db.Column(
+                db.Integer, db.ForeignKey('transaction.id'), nullable=False
+            )
     transaction = relationship(
         'Transaction', backref=backref('details')
     )
