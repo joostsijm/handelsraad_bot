@@ -68,7 +68,7 @@ def get_transactions(limit=5):
             joinedload('details')
         ).options(
             joinedload('user')
-        ).limit(limit).all()
+        ).order_by(Transaction.date_time.desc()).limit(limit).all()
     session.close()
     return transactions
 

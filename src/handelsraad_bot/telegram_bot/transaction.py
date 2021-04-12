@@ -16,7 +16,13 @@ def cmd_transactions(update, context):
                 update, ['trader', 'investor', 'chairman'], 'CMD transactions'
             ):
         return
-    transactions = database.get_transactions()
+    limit = 5
+    if context.args:
+        try:
+            limit = int(context.args[0])
+        except ValueError:
+            pass
+    transactions = database.get_transactions(limit)
     transactions_msgs = ['*Transacties:*', '```']
     for transaction in transactions:
         transactions_msgs.append(
