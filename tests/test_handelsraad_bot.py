@@ -7,7 +7,6 @@ from handelsraad_bot import SESSION, ITEMS
 from handelsraad_bot.models import User, Transaction, TransactionDetail
 
 
-
 @pytest.mark.skip()
 def test_add_transaction():
     """Test moels"""
@@ -17,15 +16,17 @@ def test_add_transaction():
         user = User()
         user.name = 'Test'
         user.telegram_id = '1'
+        user.telegram_username = 'Test'
+        user.trader = True
         session.add(user)
 
     transaction = Transaction()
-    transaction.user  = user
+    transaction.user = user
     transaction.description = 'Test transaction'
     session.add(transaction)
 
     transaction_detail = TransactionDetail()
-    transaction_detail.money = -18e8 
+    transaction_detail.money = -18e8
     transaction_detail.item_id = ITEMS['uranium']
     transaction_detail.amount = 1e6
     transaction_detail.transaction = transaction

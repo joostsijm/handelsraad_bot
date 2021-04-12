@@ -1,6 +1,6 @@
 """Telegram limit commands"""
 
-#pylint: disable=unused-argument
+# pylint: disable=unused-argument
 
 from telegram import ParseMode
 

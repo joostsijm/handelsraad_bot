@@ -99,3 +99,44 @@ def save_transaction(transaction_dict):
 
     session.commit()
     session.close()
+
+
+def get_users():
+    """Get users"""
+    session = SESSION()
+    users = session.query(User).all()
+    session.close()
+    return users
+
+
+def get_investors():
+    """Get investors"""
+    session = SESSION()
+    investors = session.query(User).filter(
+            User.investor == True
+        ).options(joinedload('investments')).all()
+    session.close()
+    return investors
+
+
+def set_role(telegram_username, role, boolean):
+    """Set role"""
+    session = SESSION()
+    user = session.query(User).filter(
+            User.telegram_username == telegram_username
+        ).first()
+    if not user:
+        user = User()
+        user.name = telegram_username
+        user.telegram_id = 1
+        user.telegram_username = telegram_username
+        session.add(user)
+
+    if role == 'chairman':
+        user.chairman = boolean
+    elif role == 'trader':
+        user.trader = boolean
+    elif role == 'investor':
+        user.investor = boolean
+    session.commit()
+    session.close()

@@ -32,6 +32,17 @@ class User(Base):
     trader = db.Column(db.Boolean, default=False, nullable=False)
     investor = db.Column(db.Boolean, default=False, nullable=False)
 
+    def get_roles(self):
+        """Get list of roles from user"""
+        roles = []
+        if self.chairman:
+            roles.append('chairman')
+        if self.trader:
+            roles.append('trader')
+        if self.investor:
+            roles.append('investor')
+        return roles
+
 
 class Investment(Base):
     """Model for investment"""
@@ -41,7 +52,7 @@ class Investment(Base):
     amount = db.Column(db.BigInteger, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     user = relationship(
-        'User', backref=backref('investments', lazy='dynamic')
+        'User', backref=backref('investments')
     )
 
 
