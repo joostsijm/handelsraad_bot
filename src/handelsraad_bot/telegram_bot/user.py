@@ -54,7 +54,7 @@ def cmd_set_role(update, context):
             telegram_username = telegram_username[1:]
     except (IndexError, ValueError):
         LOGGER.warning(
-                '%s: CMD user set role, incorrect <role>',
+                '%s: CMD user set role, incorrect <username>',
                 update.message.chat.username,
             )
         update.message.reply_text('Probleem met <username>')
