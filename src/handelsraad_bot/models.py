@@ -21,11 +21,13 @@ Base = declarative_base()
 
 
 class User(Base):
-    """Moel for user"""
+    """Model for user"""
     __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
     telegram_id = db.Column(db.Integer, nullable=False)
+    telegram_username = db.Column(db.String, nullable=False)
+    rival_region_id = db.Column(db.BigInteger, nullable=True)
     chairman = db.Column(db.Boolean, default=False, nullable=False)
     trader = db.Column(db.Boolean, default=False, nullable=False)
     investor = db.Column(db.Boolean, default=False, nullable=False)
