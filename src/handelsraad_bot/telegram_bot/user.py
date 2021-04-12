@@ -10,6 +10,14 @@ from handelsraad_bot import LOGGER, database
 def cmd_users(update, context):
     """users command"""
     LOGGER.info('%s: CMD users', update.message.chat.username)
+    executor = database.get_user(update.message.chat.username)
+    if 'chairman' not in executor.get_roles():
+        LOGGER.warning(
+                '%s: CMD users, not allowed',
+                update.message.chat.username
+            )
+        update.message.reply_text('Benodigde rol voor dit command: trader')
+        return
     users = database.get_users()
     users_msgs = ['**Users:**']
     for user in users:
@@ -27,6 +35,14 @@ def cmd_users(update, context):
 def cmd_set_role(update, context):
     """Set role"""
     LOGGER.info('%s: CMD user set role', update.message.chat.username)
+    executor = database.get_user(update.message.chat.username)
+    if 'chairman' not in executor.get_roles():
+        LOGGER.warning(
+                '%s: CMD user set role, not allowed',
+                update.message.chat.username
+            )
+        update.message.reply_text('Benodigde rol voor dit command: chairman')
+        return
     roles = [
             'chairman',
             'trader',

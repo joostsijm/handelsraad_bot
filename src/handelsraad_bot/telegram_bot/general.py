@@ -1,6 +1,6 @@
 """Telegram general commands"""
 
-#pylint: disable=unused-argument
+# pylint: disable=unused-argument
 
 from telegram import ParseMode
 
@@ -23,8 +23,16 @@ def cmd_help(update, context):
 def cmd_total(update, context):
     """Total command"""
     LOGGER.info('%s: CMD total', update.message.chat.username)
+    executor = database.get_user(update.message.chat.username)
+    if 'trader' not in executor.get_roles():
+        LOGGER.warning(
+                '%s: CMD total, not allowed',
+                update.message.chat.username
+            )
+        update.message.reply_text('Benodigde rol voor dit command: trader')
+        return
     total = database.get_total()
-    total_msgs = ['**Total**']
+    total_msgs = ['**Totaal**']
     for resource_id, total in total.items():
         total_msgs.append(
                 '{:8}, {}'.format(

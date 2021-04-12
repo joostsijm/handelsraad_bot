@@ -40,6 +40,14 @@ def cmd_investors(update, context):
 def cmd_set_investment(update, context):
     """Set investment"""
     LOGGER.info('%s: CMD set investment', update.message.chat.username)
+    executor = database.get_user(update.message.chat.username)
+    if 'chairman' not in executor.get_roles():
+        LOGGER.warning(
+                '%s: CMD set investment, not allowed',
+                update.message.chat.username
+            )
+        update.message.reply_text('Benodigde rol voor dit command: chairman')
+        return
     try:
         telegram_username = context.args[0]
         if telegram_username[:1] == '@':

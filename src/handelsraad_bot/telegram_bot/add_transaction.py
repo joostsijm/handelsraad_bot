@@ -61,12 +61,14 @@ def conv_transaction_start(update, context):
             '%s: CONV add_transaction, CMD start',
             update.message.chat.username
         )
-#    if update.message.chat.id != -293370068:
-#        update.message.reply_text(
-#                'Geen rechten om transactions te maken.' + \
-#                'Contact @bergjnl'
-#            )
-#        return ConversationHandler.END
+    executor = database.get_user(update.message.chat.username)
+    if 'trader' not in executor.get_roles():
+        LOGGER.warning(
+                '%s: CONV add_transactio, CMD start, not allowed',
+                update.message.chat.username
+            )
+        update.message.reply_text('Benodigde rol voor dit command: trader')
+        return ConversationHandler.END
     update.message.reply_text('Stuur de beschrijving voor transactie:')
 
     return TRANSACTION

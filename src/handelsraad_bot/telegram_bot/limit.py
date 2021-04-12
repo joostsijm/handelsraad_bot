@@ -11,6 +11,14 @@ from handelsraad_bot import LOGGER, ITEMS, \
 def cmd_limits(update, context):
     """limits command"""
     LOGGER.info('%s: CMD limits', update.message.chat.username)
+    executor = database.get_user(update.message.chat.username)
+    if 'trader' not in executor.get_roles():
+        LOGGER.warning(
+                '%s: CMD limits, not allowed',
+                update.message.chat.username
+            )
+        update.message.reply_text('Benodigde rol voor dit command: trader')
+        return
     limits = database.get_limits()
     limits_msgs = ['**Limits:**']
     for resource_id, limit in limits.items():
@@ -27,6 +35,14 @@ def cmd_limits(update, context):
 def cmd_set(update, context):
     """Set limit"""
     LOGGER.info('%s: CMD set limit', update.message.chat.username)
+    executor = database.get_user(update.message.chat.username)
+    if 'chairman' not in executor.get_roles():
+        LOGGER.warning(
+                '%s: CMD set limit, not allowed',
+                update.message.chat.username
+            )
+        update.message.reply_text('Benodigde rol voor dit command: chairman')
+        return
     try:
         item_name = context.args[0]
     except IndexError:

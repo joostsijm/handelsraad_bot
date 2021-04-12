@@ -110,6 +110,22 @@ def get_users():
     return users
 
 
+def get_user(telegram_username):
+    """Get user"""
+    session = SESSION()
+    user = session.query(User).filter(
+            User.telegram_username == telegram_username
+        ).first()
+    if not user:
+        user = User()
+        user.name = telegram_username
+        user.telegram_id = 1
+        user.telegam_username = telegram_username
+        session.add(user)
+        session.commit()
+    return user
+
+
 def set_role(telegram_username, role, boolean):
     """Set role"""
     session = SESSION()
