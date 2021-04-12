@@ -13,14 +13,15 @@ def cmd_users(update, context):
     if not util.check_permission(update, ['trader', 'chairman'], 'CMD users'):
         return
     users = database.get_users()
-    users_msgs = ['**Users:**']
+    users_msgs = ['*Users:*', '```']
     for user in users:
-        users_msgs.append('{}: {}'.format(
+        users_msgs.append('{:12} {}'.format(
                 user.name,
                 ', '.join(user.get_roles())
         ))
     if not users:
         users_msgs.append('no users')
+    users_msgs.append('```')
     update.message.reply_text(
             '\n'.join(users_msgs), parse_mode=ParseMode.MARKDOWN
         )

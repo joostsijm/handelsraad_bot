@@ -3,7 +3,6 @@
 # pylint: disable=unused-argument
 
 from telegram import ParseMode
-
 from rival_regions_calc import Value
 
 from handelsraad_bot import LOGGER, ITEMS_INV, database, util
@@ -28,14 +27,15 @@ def cmd_total(update, context):
             ):
         return
     total = database.get_total()
-    total_msgs = ['**Totaal**']
+    total_msgs = ['*Totaal:*', '```']
     for resource_id, total in total.items():
         total_msgs.append(
-                '{:8}, {}'.format(
+                '{:10} {:>9}'.format(
                         ITEMS_INV[resource_id],
-                        Value(total)
+                        str(Value(total))
                     )
             )
+    total_msgs.append('```')
     update.message.reply_text(
             '\n'.join(total_msgs), parse_mode=ParseMode.MARKDOWN
         )

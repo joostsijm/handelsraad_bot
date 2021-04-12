@@ -17,22 +17,28 @@ def cmd_transactions(update, context):
             ):
         return
     transactions = database.get_transactions()
-    transactions_msgs = ['**Transactions:**']
+    transactions_msgs = ['*Transacties:*', '```']
     for transaction in transactions:
         transactions_msgs.append(
-                '{}: {}'.format(
+                '{}: {} {}'.format(
                         transaction.id,
-                        transaction.description
+                        transaction.date_time.strftime("%Y-%m-%d %H:%M"),
+                        transaction.user.name
                     )
             )
+        transactions_msgs.append('├ {}'.format(transaction.description))
+        index = 1
         for detail in transaction.details:
             transactions_msgs.append(
-                    '{:8}: {} $ {}'.format(
+                    '{}{:>8} {:10} $ {:>9}'.format(
+                            '└' if index == len(transaction.details) else '├',
+                            str(Value(detail.amount)),
                             ITEMS_INV[detail.item_id],
-                            Value(detail.amount),
-                            Value(detail.money),
+                            str(Value(detail.money)),
                         )
                 )
+            index += 1
+    transactions_msgs.append('```')
     update.message.reply_text(
             '\n'.join(transactions_msgs), parse_mode=ParseMode.MARKDOWN
         )

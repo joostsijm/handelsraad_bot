@@ -36,7 +36,7 @@ def print_transaction(update, context):
             ]
     for detail in context.user_data['transaction']['details']:
         transaction_msg.append(
-                '{}: {:>8}, {:8} $ {:>8}'.format(
+                '{}: {:>8} {:10} $ {:>8}'.format(
                         index,
                         str(detail['amount']),
                         ITEMS_INV[detail['item_id']],

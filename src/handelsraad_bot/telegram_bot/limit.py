@@ -3,6 +3,7 @@
 # pylint: disable=unused-argument
 
 from telegram import ParseMode
+from rival_regions_calc import Value
 
 from handelsraad_bot import LOGGER, ITEMS, ITEMS_INV, database, util
 
@@ -15,13 +16,15 @@ def cmd_limits(update, context):
             ):
         return
     limits = database.get_limits()
-    limits_msgs = ['**Limits:**']
+    limits_msgs = ['*Limieten:*', '```']
     for resource_id, limit in limits.items():
-        limits_msgs.append('{:8}: {}'.format(
-                ITEMS_INV[resource_id], limit)
-            )
+        limits_msgs.append('{:10}: {:>9}'.format(
+                ITEMS_INV[resource_id],
+                str(Value(limit))
+            ))
     if not limits:
         limits_msgs.append('no limits')
+    limits_msgs.append('```')
     update.message.reply_text(
             '\n'.join(limits_msgs), parse_mode=ParseMode.MARKDOWN
         )

@@ -69,7 +69,7 @@ TELEGRAM_GROUP = int(os.environ['TELEGRAM_GROUP'])
 # misc
 ITEMS = {
         'money':      0,
-        'state cash': 1,
+        'state_cash': 1,
         'gold':       2,
         'oil':        3,
         'ore':        4,
@@ -79,7 +79,7 @@ ITEMS = {
 
 ITEMS_INV  = {
         0:  'money',
-        1:  'state cash',
+        1:  'state_cash',
         2:  'gold',
         3:  'oil',
         4:  'ore',

@@ -66,6 +66,8 @@ def get_transactions(limit=5):
     session = SESSION()
     transactions = session.query(Transaction).options(
             joinedload('details')
+        ).options(
+            joinedload('user')
         ).limit(limit).all()
     session.close()
     return transactions
