@@ -111,8 +111,7 @@ def conv_transaction_detail_sell(update, context):
 
     try:
         amount = Value(context.args[1])
-    except (IndexError, ValueError) as e:
-        print(e)
+    except (IndexError, ValueError):
         LOGGER.warning(
                 '%s: CONV add_transaction, CMD sell, incorrect amount',
                 update.message.chat.username,
