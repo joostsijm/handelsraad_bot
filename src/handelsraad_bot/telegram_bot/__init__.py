@@ -6,7 +6,7 @@ from telegram.ext import CommandHandler
 
 from handelsraad_bot import LOGGER, TELEGRAM_UPDATER
 
-from . import general, limit, transaction, add_transaction, user
+from . import general, limit, transaction, add_transaction, user, investor
 
 
 def run():
@@ -43,6 +43,14 @@ def run():
         )
     dispatcher.add_handler(
             CommandHandler('set_role', user.cmd_set_role)
+        )
+
+    # investor
+    dispatcher.add_handler(
+            CommandHandler('investors', investor.cmd_investors)
+        )
+    dispatcher.add_handler(
+            CommandHandler('set_investment', investor.cmd_set_investment)
         )
 
     # transaction

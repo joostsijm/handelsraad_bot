@@ -7,7 +7,8 @@ from datetime import datetime
 from sqlalchemy.orm import joinedload
 
 from handelsraad_bot import SESSION
-from handelsraad_bot.models import User, Transaction, TransactionDetail, Limit
+from handelsraad_bot.models import User, Transaction, TransactionDetail, \
+        Limit, Investment
 
 
 def get_total():
@@ -84,7 +85,7 @@ def save_transaction(transaction_dict):
         session.add(user)
 
     transaction = Transaction()
-    transaction.date_time = datetime.now()
+    transaction.date_time = datetime.utcnow()
     transaction.description = transaction_dict['description']
     transaction.user = user
     session.add(transaction)
@@ -109,16 +110,6 @@ def get_users():
     return users
 
 
-def get_investors():
-    """Get investors"""
-    session = SESSION()
-    investors = session.query(User).filter(
-            User.investor == True
-        ).options(joinedload('investments')).all()
-    session.close()
-    return investors
-
-
 def set_role(telegram_username, role, boolean):
     """Set role"""
     session = SESSION()
@@ -138,5 +129,33 @@ def set_role(telegram_username, role, boolean):
         user.trader = boolean
     elif role == 'investor':
         user.investor = boolean
+    session.commit()
+    session.close()
+
+
+def get_investors():
+    """Get investors"""
+    session = SESSION()
+    investors = session.query(User).filter(
+            User.investor == True
+        ).options(joinedload('investments')).all()
+    session.close()
+    return investors
+
+
+def set_investment(telegram_username, amount):
+    """Set investment"""
+    session = SESSION()
+    user = session.query(User).filter(
+            User.telegram_username == telegram_username
+        ).first()
+    user.investor = True
+
+    investment = Investment()
+    investment.date_time = datetime.utcnow()
+    investment.amount = amount
+    investment.user = user
+    session.add(investment)
+
     session.commit()
     session.close()

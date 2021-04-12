@@ -11,16 +11,16 @@ def cmd_users(update, context):
     """users command"""
     LOGGER.info('%s: CMD users', update.message.chat.username)
     users = database.get_users()
-    limits_msgs = ['**Users:**']
+    users_msgs = ['**Users:**']
     for user in users:
-        limits_msgs.append('{}: {}'.format(
+        users_msgs.append('{}: {}'.format(
                 user.name,
                 ', '.join(user.get_roles())
         ))
     if not users:
-        limits_msgs.append('no users')
+        users_msgs.append('no users')
     update.message.reply_text(
-            '\n'.join(limits_msgs), parse_mode=ParseMode.MARKDOWN
+            '\n'.join(users_msgs), parse_mode=ParseMode.MARKDOWN
         )
 
 
