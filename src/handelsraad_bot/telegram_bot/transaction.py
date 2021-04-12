@@ -27,17 +27,19 @@ def cmd_transactions(update, context):
     for transaction in transactions:
         transaction_total = 0
         transactions_msgs.append(
-                '{}: {} {}'.format(
+                '{}: {} {} ({})'.format(
                         transaction.id,
                         transaction.date_time.strftime("%Y-%m-%d %H:%M"),
-                        transaction.user.name
+                        transaction.user.name,
+                        transaction.user.telegram_username,
                     )
             )
         transactions_msgs.append('├ {}'.format(transaction.description))
         index = 1
         for detail in transaction.details:
             transactions_msgs.append(
-                    '├{:>8} {:10} $ {:>10}'.format(
+                    '{} {:>8} {:10} $ {:>10}'.format(
+                            '├' if len(transaction.details) - 1 else '└',
                             str(Value(detail.amount)),
                             ITEMS_INV[detail.item_id],
                             str(Value(detail.money)),
@@ -45,9 +47,10 @@ def cmd_transactions(update, context):
                 )
             transaction_total += detail.money
             index += 1
-        transactions_msgs.append(
-                '└ Totaal:            $ {:>10}'.format(str(Value(transaction_total)))
-            )
+        if len(transaction.details) - 1:
+            transactions_msgs.append('└          totaal     $ {:>10}'.format(
+                    str(Value(transaction_total))
+                ))
     transactions_msgs.append('```')
     update.message.reply_text(
             '\n'.join(transactions_msgs), parse_mode=ParseMode.MARKDOWN
