@@ -25,6 +25,7 @@ def cmd_transactions(update, context):
     transactions = database.get_transactions(limit)
     transactions_msgs = ['*Transacties:*', '```']
     for transaction in transactions:
+        transaction_total = 0
         transactions_msgs.append(
                 '{}: {} {}'.format(
                         transaction.id,
@@ -36,14 +37,17 @@ def cmd_transactions(update, context):
         index = 1
         for detail in transaction.details:
             transactions_msgs.append(
-                    '{}{:>8} {:10} $ {:>9}'.format(
-                            '└' if index == len(transaction.details) else '├',
+                    '├{:>8} {:10} $ {:>10}'.format(
                             str(Value(detail.amount)),
                             ITEMS_INV[detail.item_id],
                             str(Value(detail.money)),
                         )
                 )
+            transaction_total += detail.money
             index += 1
+        transactions_msgs.append(
+                '└ Totaal:            $ {:>10}'.format(str(Value(transaction_total)))
+            )
     transactions_msgs.append('```')
     update.message.reply_text(
             '\n'.join(transactions_msgs), parse_mode=ParseMode.MARKDOWN

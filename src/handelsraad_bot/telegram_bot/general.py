@@ -30,7 +30,7 @@ def cmd_total(update, context):
     total_msgs = ['*Totaal:*', '```']
     for resource_id, total in total.items():
         total_msgs.append(
-                '{:10} {:>9}'.format(
+                '{:10} {:>10}'.format(
                         ITEMS_INV[resource_id],
                         str(Value(total))
                     )
