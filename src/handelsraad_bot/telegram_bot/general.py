@@ -6,7 +6,7 @@ from telegram import ParseMode
 
 from rival_regions_calc import Value
 
-from handelsraad_bot import LOGGER, ITEMS_INV, database
+from handelsraad_bot import LOGGER, ITEMS_INV, database, util
 
 
 def cmd_start(update, context):
@@ -23,13 +23,9 @@ def cmd_help(update, context):
 def cmd_total(update, context):
     """Total command"""
     LOGGER.info('%s: CMD total', update.message.chat.username)
-    executor = database.get_user(update.message.chat.username)
-    if 'trader' not in executor.get_roles():
-        LOGGER.warning(
-                '%s: CMD total, not allowed',
-                update.message.chat.username
-            )
-        update.message.reply_text('Benodigde rol voor dit command: trader')
+    if not util.check_permission(
+                update, ['trader', 'investor', 'chairman'], 'CMD total'
+            ):
         return
     total = database.get_total()
     total_msgs = ['**Totaal**']

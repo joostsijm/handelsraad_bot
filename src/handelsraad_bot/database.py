@@ -6,7 +6,7 @@ from datetime import datetime
 
 from sqlalchemy.orm import joinedload
 
-from handelsraad_bot import SESSION
+from handelsraad_bot import SESSION, util
 from handelsraad_bot.models import User, Transaction, TransactionDetail, \
         Limit, Investment
 
@@ -17,8 +17,8 @@ def get_total():
     total = {
             0: 0,
         }
-    for user in session.query(User).filter(User.investment != None).all():
-        total[0] += user.investment
+    for user in session.query(User).filter(User.investor == True).all():
+        total[0] += util.total_investment(user)
     transaction_details = session.query(TransactionDetail).all()
     for detail in transaction_details:
         if detail.item_id not in total:
@@ -77,12 +77,6 @@ def save_transaction(transaction_dict):
     user = session.query(User).filter(
             User.telegram_id == transaction_dict['telegram_id']
         ).first()
-    if not user:
-        user = User()
-        user.name = 'test'
-        user.telegram_id = transaction_dict['telegram_id']
-        user.trader = True
-        session.add(user)
 
     transaction = Transaction()
     transaction.date_time = datetime.utcnow()
@@ -102,6 +96,25 @@ def save_transaction(transaction_dict):
     session.close()
 
 
+def add_user(name, telegram_id, telegram_username):
+    """Add new user"""
+    user = User()
+    user.name = name
+    user.telegram_id = telegram_id
+    user.telegam_username = telegram_username
+    save_user(user)
+    return user
+
+
+def save_user(user):
+    """Save user to database"""
+    session = SESSION()
+    session.add(user)
+    session.commit()
+    session.close()
+    return User
+
+
 def get_users():
     """Get users"""
     session = SESSION()
@@ -110,19 +123,23 @@ def get_users():
     return users
 
 
-def get_user(telegram_username):
-    """Get user"""
+def get_user_by_telegram_id(telegram_id):
+    """Get user by telegram id"""
+    session = SESSION()
+    user = session.query(User).filter(
+            User.telegram_id == telegram_id
+        ).first()
+    session.close()
+    return user
+
+
+def get_user_by_telegram_username(telegram_username):
+    """Get user by telegram username"""
     session = SESSION()
     user = session.query(User).filter(
             User.telegram_username == telegram_username
         ).first()
-    if not user:
-        user = User()
-        user.name = telegram_username
-        user.telegram_id = 1
-        user.telegam_username = telegram_username
-        session.add(user)
-        session.commit()
+    session.close()
     return user
 
 

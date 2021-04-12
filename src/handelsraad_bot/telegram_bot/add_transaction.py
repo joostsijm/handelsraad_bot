@@ -7,7 +7,7 @@ from telegram.ext import CommandHandler, MessageHandler, Filters, \
         ConversationHandler
 from rival_regions_calc import Value
 
-from handelsraad_bot import LOGGER, ITEMS, ITEMS_INV, database
+from handelsraad_bot import LOGGER, ITEMS, ITEMS_INV, database, util
 
 
 INSTRUCTIONS = """```
@@ -61,13 +61,9 @@ def conv_transaction_start(update, context):
             '%s: CONV add_transaction, CMD start',
             update.message.chat.username
         )
-    executor = database.get_user(update.message.chat.username)
-    if 'trader' not in executor.get_roles():
-        LOGGER.warning(
-                '%s: CONV add_transactio, CMD start, not allowed',
-                update.message.chat.username
-            )
-        update.message.reply_text('Benodigde rol voor dit command: trader')
+    if not util.check_permission(
+                update, ['trader', 'chairman'], 'CONV add_transaction'
+            ):
         return ConversationHandler.END
     update.message.reply_text('Stuur de beschrijving voor transactie:')
 
@@ -82,6 +78,7 @@ def conv_transaction_ask_details(update, context):
             update.message.text
         )
     context.user_data['transaction'] = {
+            'telegram_username': update.message.chat.username,
             'telegram_id': update.message.chat.id,
             'description': update.message.text,
             'details': [],
