@@ -8,6 +8,7 @@ from telegram.ext import CommandHandler, MessageHandler, Filters, \
 from rival_regions_calc import Value
 
 from handelsraad_bot import LOGGER, ITEMS, ITEMS_INV, database, util
+from handelsraad_bot.telegram_bot import transaction
 
 
 INSTRUCTIONS = """```
@@ -223,6 +224,8 @@ def conv_transaction_save(update, context):
 
     update.message.reply_text('Transaction opgeslagen')
     context.user_data.clear()
+
+    transaction.cmd_transactions(update, context)
 
     return ConversationHandler.END
 
