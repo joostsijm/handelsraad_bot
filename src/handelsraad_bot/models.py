@@ -29,7 +29,18 @@ class User(Base):
     chairman = db.Column(db.Boolean, default=False, nullable=False)
     trader = db.Column(db.Boolean, default=False, nullable=False)
     investor = db.Column(db.Boolean, default=False, nullable=False)
-    investment = db.Column(db.BigInteger, nullable=True)
+
+
+class Investment(Base):
+    """Model for investment"""
+    __tablename__ = 'investment'
+    id = db.Column(db.Integer, primary_key=True)
+    date_time = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    amount = db.Column(db.BigInteger, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user = relationship(
+        'User', backref=backref('investments', lazy='dynamic')
+    )
 
 
 class Transaction(Base):
