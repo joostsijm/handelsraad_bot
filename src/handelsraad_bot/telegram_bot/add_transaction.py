@@ -36,7 +36,7 @@ def print_transaction(update, context):
             ]
     for detail in context.user_data['transaction']['details']:
         transaction_msg.append(
-                '{}: {:>6}, {:8} $ {:>6}'.format(
+                '{}: {:>8}, {:8} $ {:>8}'.format(
                         index,
                         str(detail['amount']),
                         ITEMS_INV[detail['item_id']],
@@ -92,49 +92,65 @@ def conv_transaction_ask_details(update, context):
     return DETAIL
 
 
-def conv_transaction_detail_sell(update, context):
-    """Add sell transaction detail"""
+def conv_transaction_detail_add(update, context):
+    """Add transaction detail"""
+    command = update.message.text.split(' ')[0]
     LOGGER.info(
-            '%s: CONV add_transaction, CMD sell',
-            update.message.chat.username
+            '%s: CONV add_transaction, CMD %s',
+            update.message.chat.username,
+            command
         )
     try:
         item_id = ITEMS[context.args[0]]
     except (IndexError, KeyError):
         LOGGER.warning(
-                '%s: CONV add_transaction, CMD sell, incorrect item name',
+                '%s: CONV add_transaction, CMD %s, incorrect item name',
                 update.message.chat.username,
+                command
             )
         update.message.reply_text('Probleem met <name>.')
-        update.message.reply_text('/sell <item> <amount> <price_each>')
+        update.message.reply_text(
+                '{} <item> <amount> <price_each>'.format(command)
+            )
         return DETAIL
 
     try:
         amount = Value(context.args[1])
     except (IndexError, ValueError):
         LOGGER.warning(
-                '%s: CONV add_transaction, CMD sell, incorrect amount',
+                '%s: CONV add_transaction, CMD %s, incorrect amount',
                 update.message.chat.username,
+                command
             )
         update.message.reply_text('Probleem met <amount>.')
-        update.message.reply_text('/sell <item> <amount> <price_each>')
+        update.message.reply_text(
+                '{} <item> <amount> <price_each>'.format(command)
+            )
         return DETAIL
 
     try:
-        price_each = Value(context.args[2])
+        price = Value(context.args[2])
     except (IndexError, ValueError):
         LOGGER.warning(
-                '%s: CONV add_transaction, CMD sell, incorrect price each',
+                '%s: CONV add_transaction, CMD %s, incorrect price each',
                 update.message.chat.username,
+                command
             )
         update.message.reply_text('Probleem met <price_each>.')
-        update.message.reply_text('/sell <item> <amount> <price_each>')
+        update.message.reply_text(
+                '{} <item> <amount> <price_each>'.format(command)
+            )
         return DETAIL
+
+    if command == '/sell':
+        price = amount * price
+    elif command == '/buy':
+        price = -(amount * price)
 
     context.user_data['transaction']['details'].append({
             'item_id': item_id,
             'amount': amount,
-            'money': Value(amount * price_each),
+            'money': Value(price),
         })
 
     print_transaction(update, context)
@@ -149,12 +165,12 @@ def conv_transaction_detail_sell(update, context):
     return DETAIL
 
 
-def conv_transaction_detail_buy(update, context):
-    """Add buy transaction detail"""
+# def conv_transaction_detail_buy(update, context):
+#     """Add buy transaction detail"""
 
 
-def conv_transaction_detail_add(update, context):
-    """Add transaction detail"""
+# def conv_transaction_detail_add(update, context):
+#     """Add transaction detail"""
 
 
 def conv_transaction_detail_remove(update, context):
@@ -245,11 +261,11 @@ conversation = ConversationHandler(
                 DETAIL: [
                         CommandHandler(
                                 'sell',
-                                conv_transaction_detail_sell
+                                conv_transaction_detail_add
                             ),
                         CommandHandler(
                                 'buy',
-                                conv_transaction_detail_buy
+                                conv_transaction_detail_add
                             ),
                         CommandHandler(
                                 'add',
