@@ -31,7 +31,7 @@ def check_permission(update, roles, action):
         )
     update.message.reply_text(
             'Rollen die recht hebben op dit command: {}'.format(
-                    ', '.join(roles.title())
+                    ', '.join(roles)
                 )
         )
     return False

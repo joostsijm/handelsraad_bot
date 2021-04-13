@@ -130,7 +130,7 @@ def add_user(name, telegram_id, telegram_username):
     user = User()
     user.name = name
     user.telegram_id = telegram_id
-    user.telegam_username = telegram_username
+    user.telegram_username = telegram_username
     save_user(user)
     return user
 
