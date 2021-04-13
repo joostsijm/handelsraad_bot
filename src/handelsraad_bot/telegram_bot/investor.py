@@ -26,7 +26,7 @@ def cmd_investors(update, context):
         investor_dict['investment'] += util.total_investment(investor)
         total += investor_dict['investment']
         investors.append(investor_dict)
-    investors_msgs = ['**Investors:**', '```']
+    investors_msgs = ['*Investors:*', '```']
     for investor in investors:
         investors_msgs.append('{:10}: $ {:>8}'.format(
                 investor['name'],
@@ -34,7 +34,7 @@ def cmd_investors(update, context):
         ))
     if not investors:
         investors_msgs.append('no investors')
-    investors_msgs.append('totaal: $ {:>8}'.format(str(Value(total))))
+    investors_msgs.append('Totaal    : $ {:>8}'.format(str(Value(total))))
     investors_msgs.append('```')
     update.message.reply_text(
             '\n'.join(investors_msgs), parse_mode=ParseMode.MARKDOWN

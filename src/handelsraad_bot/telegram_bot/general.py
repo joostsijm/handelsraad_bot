@@ -50,14 +50,20 @@ def cmd_total(update, context):
         return
     total = database.get_total()
     total_msgs = ['*Totaal:*', '```']
-    for resource_id, resource in total.items():
+    total_money = 0
+    for item_id, item in total.items():
         total_msgs.append(
                 '{:10} {:>13} $ {:>5}/1'.format(
-                        ITEMS_INV[resource_id],
-                        str(Value(resource['amount'])),
-                        str(Value(resource['average']))
+                        ITEMS_INV[item_id],
+                        str(Value(item['amount'])),
+                        str(Value(item['average']))
                     )
             )
+        if item_id:
+            total_money += item['amount'] * item['average']
+        else:
+            total_money += item['amount']
+    total_msgs.append('Totaal $    {:>12}'.format(str(Value(total_money))))
     total_msgs.append('```')
     update.message.reply_text(
             '\n'.join(total_msgs), parse_mode=ParseMode.MARKDOWN
