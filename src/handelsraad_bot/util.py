@@ -17,7 +17,7 @@ def check_permission(update, roles, action):
             executor = database.save_user(executor)
         else:
             executor = database.add_user(
-                    update.message.chat.firstname,
+                    update.message.chat.first_name,
                     update.message.chat.id,
                     update.message.chat.username
                 )
