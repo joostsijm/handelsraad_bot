@@ -63,7 +63,7 @@ def cmd_total(update, context):
             total_money += item['amount'] * item['average']
         else:
             total_money += item['amount']
-    total_msgs.append('Totaal $    {:>12}'.format(str(Value(total_money))))
+    total_msgs.append('Totaal $ {:>15}'.format(str(Value(total_money))))
     total_msgs.append('```')
     update.message.reply_text(
             '\n'.join(total_msgs), parse_mode=ParseMode.MARKDOWN
