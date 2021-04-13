@@ -10,7 +10,7 @@ from handelsraad_bot import LOGGER, ITEMS, ITEMS_INV, database, util
 
 def cmd_limits(update, context):
     """limits command"""
-    LOGGER.info('%s: CMD limits', update.message.chat.username)
+    LOGGER.info('%s: CMD limits', update.message.from_user.username)
     if not util.check_permission(
                 update, ['trader', 'investor', 'chairman'], 'CMD limits'
             ):
@@ -32,7 +32,7 @@ def cmd_limits(update, context):
 
 def cmd_set(update, context):
     """Set limit"""
-    LOGGER.info('%s: CMD set limit', update.message.chat.username)
+    LOGGER.info('%s: CMD set limit', update.message.from_user.username)
     if not util.check_permission(update, ['chairman'], 'CMD set limit'):
         return
     try:
@@ -77,7 +77,7 @@ def cmd_set(update, context):
 
 def cmd_remove(update, context):
     """Set limit"""
-    LOGGER.info('%s: CMD remove limit', update.message.chat.username)
+    LOGGER.info('%s: CMD remove limit', update.message.from_user.username)
     if not util.check_permission(update, ['chairman'], 'CMD remove limit'):
         return
     try:

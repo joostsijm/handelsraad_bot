@@ -60,7 +60,7 @@ def conv_transaction_start(update, context):
     """Start message"""
     LOGGER.info(
             '%s: CONV add_transaction, CMD start',
-            update.message.chat.username
+            update.message.from_user.username
         )
     if not util.check_permission(
                 update, ['trader', 'chairman'], 'CONV add_transaction'
@@ -75,12 +75,12 @@ def conv_transaction_ask_details(update, context):
     """Transaction ask details"""
     LOGGER.info(
             '%s: CONV add_transaction, description: "%s"',
-            update.message.chat.username,
+            update.message.from_user.username,
             update.message.text
         )
     context.user_data['transaction'] = {
-            'telegram_username': update.message.chat.username,
-            'telegram_id': update.message.chat.id,
+            'telegram_username': update.message.from_user.username,
+            'telegram_id': update.message.from_user.id,
             'description': update.message.text,
             'details': [],
         }
@@ -97,7 +97,7 @@ def conv_transaction_detail_add(update, context):
     command = update.message.text.split(' ')[0]
     LOGGER.info(
             '%s: CONV add_transaction, CMD %s',
-            update.message.chat.username,
+            update.message.from_user.username,
             command
         )
     try:
@@ -105,7 +105,7 @@ def conv_transaction_detail_add(update, context):
     except (IndexError, KeyError):
         LOGGER.warning(
                 '%s: CONV add_transaction, CMD %s, incorrect item name',
-                update.message.chat.username,
+                update.message.from_user.username,
                 command
             )
         update.message.reply_text('Probleem met <name>.')
@@ -119,7 +119,7 @@ def conv_transaction_detail_add(update, context):
     except (IndexError, ValueError):
         LOGGER.warning(
                 '%s: CONV add_transaction, CMD %s, incorrect amount',
-                update.message.chat.username,
+                update.message.from_user.username,
                 command
             )
         update.message.reply_text('Probleem met <amount>.')
@@ -133,7 +133,7 @@ def conv_transaction_detail_add(update, context):
     except (IndexError, ValueError):
         LOGGER.warning(
                 '%s: CONV add_transaction, CMD %s, incorrect price each',
-                update.message.chat.username,
+                update.message.from_user.username,
                 command
             )
         update.message.reply_text('Probleem met <price_each>.')
@@ -209,7 +209,7 @@ def conv_transaction_save(update, context):
     """Save transaction"""
     LOGGER.info(
             '%s: CONV add_transaction, CMD save',
-            update.message.chat.username
+            update.message.from_user.username
         )
 
     if len(context.user_data['transaction']['details']) == 0:
@@ -234,7 +234,7 @@ def conv_transaction_cancel(update, context):
     """Cancel transaction"""
     LOGGER.info(
             '%s: CONV add_transaction, CMD cancel',
-            update.message.chat.username
+            update.message.from_user.username
         )
     update.message.reply_text('Transaction gecanceld.')
     context.user_data.clear()

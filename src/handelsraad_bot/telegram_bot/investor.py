@@ -10,7 +10,7 @@ from handelsraad_bot import LOGGER, database, util
 
 def cmd_investors(update, context):
     """List investors"""
-    LOGGER.info('%s: CMD investors', update.message.chat.username)
+    LOGGER.info('%s: CMD investors', update.message.from_user.username)
     if not util.check_permission(
                 update, ['trader', 'investor', 'chairman'], 'CMD investors'
             ):
@@ -42,7 +42,7 @@ def cmd_investors(update, context):
 
 def cmd_set_investment(update, context):
     """Set investment"""
-    LOGGER.info('%s: CMD set investment', update.message.chat.username)
+    LOGGER.info('%s: CMD set investment', update.message.from_user.username)
     if not util.check_permission(update, ['chairman'], 'CMD set investment'):
         return
     try:
@@ -52,7 +52,7 @@ def cmd_set_investment(update, context):
     except (IndexError, ValueError):
         LOGGER.warning(
                 '%s: CMD set investment, incorrect <investment>',
-                update.message.chat.username,
+                update.message.from_user.username,
             )
         update.message.reply_text('Probleem met <username>')
         update.message.reply_text('/set_investment <username> <amount>')
@@ -63,7 +63,7 @@ def cmd_set_investment(update, context):
     except (IndexError, ValueError):
         LOGGER.warning(
                 '%s: CMD set investment, incorrect <amount>',
-                update.message.chat.username,
+                update.message.from_user.username,
             )
         update.message.reply_text('Probleem met <amount>')
         update.message.reply_text('/set_investment <username> <amount>')

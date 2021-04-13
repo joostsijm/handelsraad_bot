@@ -43,7 +43,7 @@ def cmd_help(update, context):
 
 def cmd_total(update, context):
     """Total command"""
-    LOGGER.info('%s: CMD total', update.message.chat.username)
+    LOGGER.info('%s: CMD total', update.message.from_user.username)
     if not util.check_permission(
                 update, ['trader', 'investor', 'chairman'], 'CMD total'
             ):

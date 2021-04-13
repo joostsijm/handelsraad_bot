@@ -9,7 +9,7 @@ from handelsraad_bot import LOGGER, database, util
 
 def cmd_users(update, context):
     """users command"""
-    LOGGER.info('%s: CMD users', update.message.chat.username)
+    LOGGER.info('%s: CMD users', update.message.from_user.username)
     if not util.check_permission(update, ['trader', 'chairman'], 'CMD users'):
         return
     users = database.get_users()
@@ -29,7 +29,7 @@ def cmd_users(update, context):
 
 def cmd_set_role(update, context):
     """Set role"""
-    LOGGER.info('%s: CMD user set role', update.message.chat.username)
+    LOGGER.info('%s: CMD user set role', update.message.from_user.username)
     if not util.check_permission(update, ['chairman'], 'CMD user set role'):
         return
     roles = [
@@ -44,7 +44,7 @@ def cmd_set_role(update, context):
     except (IndexError, ValueError):
         LOGGER.warning(
                 '%s: CMD user set role, incorrect <username>',
-                update.message.chat.username,
+                update.message.from_user.username,
             )
         update.message.reply_text('Probleem met <username>')
         update.message.reply_text('/set_role <username> <role> <boolean>')
@@ -57,7 +57,7 @@ def cmd_set_role(update, context):
     except (IndexError, ValueError):
         LOGGER.warning(
                 '%s: CMD user set role, incorrect <role>',
-                update.message.chat.username,
+                update.message.from_user.username,
             )
         update.message.reply_text('Probleem met <role>')
         update.message.reply_text('/set_role <username> <role> <boolean>')
@@ -68,7 +68,7 @@ def cmd_set_role(update, context):
     except (IndexError, ValueError):
         LOGGER.warning(
                 '%s: CMD user set role, incorrect <boolean>',
-                update.message.chat.username,
+                update.message.from_user.username,
             )
         update.message.reply_text('Probleem met <boolean>')
         update.message.reply_text('/set_role <username> <role> <boolean>')

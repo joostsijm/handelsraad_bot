@@ -11,7 +11,7 @@ from handelsraad_bot import LOGGER, ITEMS_INV, database, util
 
 def cmd_transactions(update, context):
     """transactions command"""
-    LOGGER.info('%s: CMD transactions', update.message.chat.username)
+    LOGGER.info('%s: CMD transactions', update.message.from_user.username)
     if not util.check_permission(
                 update, ['trader', 'investor', 'chairman'], 'CMD transactions'
             ):

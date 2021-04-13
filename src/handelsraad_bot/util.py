@@ -6,27 +6,27 @@ from handelsraad_bot import LOGGER, database
 def check_permission(update, roles, action):
     """Check permissions"""
     executor = database.get_user_by_telegram_id(
-            update.message.chat.id
+            update.message.from_user.id
         )
     if not executor:
         executor = database.get_user_by_telegram_username(
-                update.message.chat.username
+                update.message.from_user.username
             )
         if executor:
-            executor.telegram_id = update.message.chat.id
+            executor.telegram_id = update.message.from_user.id
             executor = database.save_user(executor)
         else:
             executor = database.add_user(
-                    update.message.chat.first_name,
-                    update.message.chat.id,
-                    update.message.chat.username
+                    update.message.from_user.first_name,
+                    update.message.from_user.id,
+                    update.message.from_user.username
                 )
     for role in executor.get_roles():
         if role in roles:
             return True
     LOGGER.warning(
             '%s: %s, not allowed',
-            update.message.chat.username,
+            update.message.from_user.username,
             action
         )
     update.message.reply_text(
