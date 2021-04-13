@@ -20,6 +20,9 @@ def run():
             CommandHandler('start', general.cmd_start)
         )
     dispatcher.add_handler(
+            CommandHandler('hulp', general.cmd_hulp)
+        )
+    dispatcher.add_handler(
             CommandHandler('help', general.cmd_help)
         )
     dispatcher.add_handler(
