@@ -78,6 +78,8 @@ def cmd_set(update, context):
 def cmd_remove(update, context):
     """Set limit"""
     LOGGER.info('%s: CMD remove limit', update.message.chat.username)
+    if not util.check_permission(update, ['chairman'], 'CMD remove limit'):
+        return
     try:
         item_name = context.args[0]
     except IndexError:
