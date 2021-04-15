@@ -1,6 +1,6 @@
 """Common utilities"""
 
-from handelsraad_bot import LOGGER, database
+from handelsraad_bot import LOGGER, TESTING, database
 
 
 def check_permission(update, roles, action):
@@ -21,6 +21,8 @@ def check_permission(update, roles, action):
                     update.message.from_user.id,
                     update.message.from_user.username
                 )
+    if TESTING:
+        return True
     for role in executor.get_roles():
         if role in roles:
             return True

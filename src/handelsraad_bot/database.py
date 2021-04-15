@@ -52,6 +52,7 @@ def get_total():
                 money_total / total[resource]['amount'], 2
             ))
     total[0]['amount'] = round(total[0]['amount'] / 1e6) * 1e6
+    session.expunge_all()
     session.close()
     return total
 
@@ -62,6 +63,7 @@ def get_limits():
     limits = {}
     for limit in session.query(Limit).all():
         limits[limit.item_id] = limit.amount
+    session.expunge_all()
     session.close()
     return limits
 
@@ -96,6 +98,7 @@ def get_transactions(limit=5):
         ).options(
             joinedload('user')
         ).order_by(Transaction.date_time.desc()).limit(limit).all()
+    session.expunge_all()
     session.close()
     return transactions
 
@@ -140,14 +143,16 @@ def save_user(user):
     session = SESSION()
     session.add(user)
     session.commit()
+    session.expunge_all()
     session.close()
-    return User
+    return user
 
 
 def get_users():
     """Get users"""
     session = SESSION()
     users = session.query(User).all()
+    session.expunge_all()
     session.close()
     return users
 
@@ -158,6 +163,7 @@ def get_user_by_telegram_id(telegram_id):
     user = session.query(User).filter(
             User.telegram_id == telegram_id
         ).first()
+    session.expunge_all()
     session.close()
     return user
 
@@ -168,6 +174,7 @@ def get_user_by_telegram_username(telegram_username):
     user = session.query(User).filter(
             User.telegram_username == telegram_username
         ).first()
+    session.expunge_all()
     session.close()
     return user
 
@@ -201,6 +208,7 @@ def get_investors():
     investors = session.query(User).filter(
             User.investor == True
         ).options(joinedload('investments')).all()
+    session.expunge_all()
     session.close()
     return investors
 
