@@ -55,3 +55,31 @@ def cmd_transactions(update, context):
     update.message.reply_text(
             '\n'.join(transactions_msgs), parse_mode=ParseMode.MARKDOWN
         )
+
+
+def cmd_remove_transaction(update, context):
+    """remove transaction command"""
+    LOGGER.info(
+            '%s: CMD remove transaction',
+            update.message.from_user.username
+        )
+    if not util.check_permission(
+                update, ['chairman'], 'CMD remove transaction'
+            ):
+        return
+    try:
+        transaction_id = int(context.args[0])
+    except ValueError:
+        LOGGER.warning(
+                '%s: CMD remove transaction, incorrect <transaction_id>',
+                update.message.from_user.username,
+            )
+        update.message.reply_text('Probleem met <transaction_id>')
+        update.message.reply_text('/remove_transaction <transaction_id>')
+        return
+    database.remove_transaction(transaction_id)
+    update.message.reply_text(
+            'Removed transaction {}'.format(transaction_id),
+            parse_mode=ParseMode.MARKDOWN
+        )
+    cmd_transactions(update, context)

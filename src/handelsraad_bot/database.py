@@ -127,6 +127,15 @@ def save_transaction(transaction_dict):
     session.commit()
     session.close()
 
+def remove_transaction(transaction_id):
+    """Remove transaction"""
+    session = SESSION()
+    transaction = session.query(Transaction).filter(
+            Transaction.id == transaction_id
+        ).first()
+    session.delete(transaction)
+    session.close()
+
 
 def add_user(name, telegram_id, telegram_username):
     """Add new user"""

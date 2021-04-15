@@ -58,10 +58,16 @@ def run():
 
     # transaction
     dispatcher.add_handler(
+            add_transaction.conversation
+        )
+    dispatcher.add_handler(
             CommandHandler('transactions', transaction.cmd_transactions)
         )
     dispatcher.add_handler(
-            add_transaction.conversation
+            CommandHandler(
+                    'remove_transaction',
+                    transaction.cmd_remove_transaction
+                )
         )
 
     TELEGRAM_UPDATER.start_polling()
