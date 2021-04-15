@@ -38,7 +38,7 @@ def cmd_help(update, context):
             '/set\\_investment <username> <amount>\n'
             '/add\\_transaction\n'
             '/transactions <limit>\n'
-            '/remove_transaction <transaction_id>',
+            '/remove\\_transaction <transaction\\_id>',
             parse_mode=ParseMode.MARKDOWN
         )
 
