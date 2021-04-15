@@ -24,7 +24,7 @@ DATA_DIR = user_data_dir('handelsraad_bot', 'bergc')
 pathlib2.Path(DATA_DIR).mkdir(parents=True, exist_ok=True)
 
 # database
-ENGINE = create_engine(os.environ["DATABASE_URI"], client_encoding='utf8')
+ENGINE = create_engine(os.environ.get('DATABASE_URI'), client_encoding='utf8')
 SESSION = sessionmaker(bind=ENGINE)
 
 # scheduler
@@ -60,11 +60,12 @@ LOGGER.addHandler(FILE_HANDLER)
 TELEGRAM_LOGGER.addHandler(STREAM_HANDLER)
 TELEGRAM_LOGGER.addHandler(FILE_HANDLER)
 
-TELEGRAM_KEY = os.environ['TELEGRAM_KEY']
+TELEGRAM_KEY = os.environ.get('TELEGRAM_KEY')
 TELEGRAM_BOT = telegram.Bot(token=TELEGRAM_KEY)
 TELEGRAM_UPDATER = Updater(TELEGRAM_KEY, use_context=True)
 
-TELEGRAM_GROUP = int(os.environ['TELEGRAM_GROUP'])
+TELEGRAM_GROUP = int(os.environ.get('TELEGRAM_GROUP'))
+TESTING = bool(os.environ.get('TESTING', 'false').lower() == 'true')
 
 # misc
 ITEMS = {
