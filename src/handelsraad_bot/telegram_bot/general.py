@@ -34,11 +34,11 @@ def cmd_help(update, context):
             '/remove\\_limit <item\\_nam>\n'
             '/users\n'
             '/set\\_role <username> <role> <boolean>\n'
-            '/investors'
+            '/investors\n'
             '/set\\_investment <username> <amount>\n'
             '/add\\_transaction\n'
             '/transactions <limit>\n'
-            '/remove_transaction <transaction_id>',
+            '/remove\\_transaction <transaction\\_id>',
             parse_mode=ParseMode.MARKDOWN
         )
 
