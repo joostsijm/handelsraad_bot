@@ -1,5 +1,7 @@
 """Common utilities"""
 
+from rival_regions_calc import Value
+
 from handelsraad_bot import LOGGER, TESTING, database
 
 
@@ -57,33 +59,43 @@ def get_total():
         }
     for user in database.get_investors():
         total[0]['amount'] += total_investment(user)
-    resource_details = {}
+    item_details = {}
     for detail in database.get_transaction_details():
         if detail.item_id not in total:
             total[detail.item_id] = {
                     'amount': 0,
                     'average': 0
                 }
-            resource_details[detail.item_id] = []
+            item_details[detail.item_id] = []
         total[detail.item_id]['amount'] += detail.amount
         total[0]['amount'] += detail.money
-        resource_details[detail.item_id].append(detail)
+        item_details[detail.item_id].append(detail)
 
-    for resource, details in resource_details.items():
+    for item_id, details in item_details.items():
         money_total = 0
-        resource_total = total[resource]['amount']
+        item_total = total[item_id]['amount']
         for detail in reversed(details):
             if detail.money > 0:
                 continue
-            if resource_total < detail.amount:
+            if item_total < detail.amount:
                 money_total += round(
-                        resource_total * (detail.money / detail.amount), 2
+                        item_total * (detail.money / detail.amount), 2
                     )
                 break
             money_total += detail.money
-            resource_total -= detail.amount
+            item_total -= detail.amount
         total[detail.item_id]['average'] = abs(round(
-                money_total / total[resource]['amount'], 2
+                money_total / total[item_id]['amount'], 2
             ))
-    total[0]['amount'] = round(total[0]['amount'] / 1e6) * 1e6
+
     return total
+
+def round_number(number, length):
+    """Round number"""
+    i = 1
+    number = Value(number)
+    while len(str(number)) > length:
+        amount = pow(1000, i)
+        number =  Value(round(number / amount) * amount)
+        i += 1
+    return number

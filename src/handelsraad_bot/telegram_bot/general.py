@@ -5,7 +5,7 @@
 from telegram import ParseMode
 from rival_regions_calc import Value
 
-from handelsraad_bot import LOGGER, ITEMS_INV, database, util
+from handelsraad_bot import LOGGER, ITEMS_INV, util
 
 
 def cmd_start(update, context):
@@ -54,22 +54,19 @@ def cmd_total(update, context):
     total_msgs = ['*Totaal:*', '```']
     total_money = 0
     for item_id, item in total.items():
-#        while (len(str(Value(item['amount']))) > 6):
-#            m
-
         total_msgs.append(
-                '{:3} $ {:>13} {:>6}/1 {:>13}'.format(
+                '{:3} $ {:>10} {:>6}/1 {:>10}'.format(
                         ITEMS_INV[item_id][:3],
-                        str(Value(item['amount'])),
-                        str(Value(item['average'])),
-                        str(Value(item['amount'] * item['average']))
+                        str(util.round_number(item['amount'], 10)),
+                        str(util.round_number(item['average'], 6)),
+                        str(util.round_number(item['amount'] * item['average'], 10))
                     )
             )
         if item_id:
             total_money += item['amount'] * item['average']
         else:
             total_money += item['amount']
-    total_msgs.append('tot $ {:>15}'.format(str(Value(total_money))))
+    total_msgs.append('tot $ {:>10}'.format(str(util.round_number(total_money, 10))))
     total_msgs.append('```')
     update.message.reply_text(
             '\n'.join(total_msgs), parse_mode=ParseMode.MARKDOWN
