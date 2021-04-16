@@ -6,55 +6,18 @@ from datetime import datetime
 
 from sqlalchemy.orm import joinedload
 
-from handelsraad_bot import SESSION, util
+from handelsraad_bot import SESSION
 from handelsraad_bot.models import User, Transaction, TransactionDetail, \
         Limit, Investment
 
 
-def get_total():
+def get_transaction_details():
     """Get total"""
     session = SESSION()
-    total = {
-            0: {
-                    'amount': 0,
-                    'average': 0
-                }
-        }
-    for user in session.query(User).filter(User.investor == True).all():
-        total[0]['amount'] += util.total_investment(user)
     transaction_details = session.query(TransactionDetail).all()
-    resource_details = {}
-    for detail in transaction_details:
-        if detail.item_id not in total:
-            total[detail.item_id] = {
-                    'amount': 0,
-                    'average': 0
-                }
-            resource_details[detail.item_id] = []
-        total[detail.item_id]['amount'] += detail.amount
-        total[0]['amount'] += detail.money
-        resource_details[detail.item_id].append(detail)
-
-    for resource, details in resource_details.items():
-        money_total = 0
-        resource_total = total[resource]['amount']
-        for detail in reversed(details):
-            if detail.money > 0:
-                continue
-            if resource_total < detail.amount:
-                money_total += round(
-                        resource_total * (detail.money / detail.amount), 2
-                    )
-                break
-            money_total += detail.money
-            resource_total -= detail.amount
-        total[detail.item_id]['average'] = abs(round(
-                money_total / total[resource]['amount'], 2
-            ))
-    total[0]['amount'] = round(total[0]['amount'] / 1e6) * 1e6
     session.expunge_all()
     session.close()
-    return total
+    return transaction_details
 
 
 def get_limits():

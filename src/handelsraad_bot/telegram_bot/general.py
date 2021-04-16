@@ -50,22 +50,26 @@ def cmd_total(update, context):
                 update, ['trader', 'investor', 'chairman'], 'CMD total'
             ):
         return
-    total = database.get_total()
+    total = util.get_total()
     total_msgs = ['*Totaal:*', '```']
     total_money = 0
     for item_id, item in total.items():
+#        while (len(str(Value(item['amount']))) > 6):
+#            m
+
         total_msgs.append(
-                '{:10} {:>13} $ {:>5}/1'.format(
-                        ITEMS_INV[item_id],
+                '{:3} $ {:>13} {:>6}/1 {:>13}'.format(
+                        ITEMS_INV[item_id][:3],
                         str(Value(item['amount'])),
-                        str(Value(item['average']))
+                        str(Value(item['average'])),
+                        str(Value(item['amount'] * item['average']))
                     )
             )
         if item_id:
             total_money += item['amount'] * item['average']
         else:
             total_money += item['amount']
-    total_msgs.append('Totaal $ {:>15}'.format(str(Value(total_money))))
+    total_msgs.append('tot $ {:>15}'.format(str(Value(total_money))))
     total_msgs.append('```')
     update.message.reply_text(
             '\n'.join(total_msgs), parse_mode=ParseMode.MARKDOWN
