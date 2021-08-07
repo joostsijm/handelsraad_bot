@@ -6,7 +6,7 @@ from telegram import ParseMode
 
 from rival_regions_calc import Value
 
-from handelsraad_bot import LOGGER, ITEMS_INV, database, util
+from handelsraad_bot import LOGGER, ITEMS, ITEMS_INV, database, util
 
 
 def cmd_transactions(update, context):
@@ -16,13 +16,16 @@ def cmd_transactions(update, context):
                 update, ['trader', 'investor', 'chairman'], 'CMD transactions'
             ):
         return
-    limit = 5
-    if context.args:
-        try:
-            limit = int(context.args[0])
-        except ValueError:
-            pass
-    transactions = database.get_transactions(limit)
+    try:
+        limit = int(context.args[0])
+    except (IndexError, KeyError):
+        limit = 5
+    try:
+        item_id = ITEMS[context.args[1]]
+    except (IndexError, KeyError):
+        item_id = None
+
+    transactions = database.get_transactions(limit, item_id)
     transactions_msgs = ['*Transacties:*']
     for transaction in transactions:
         transaction_total = 0
@@ -38,10 +41,16 @@ def cmd_transactions(update, context):
         transactions_msgs.append('├ {}'.format(transaction.description))
         for detail in transaction.details:
             transactions_msgs.append(
-                    '{} {:>8} {:10} $ {:>10}'.format(
+                    '{} {:>14} {:>14}'.format(
                             '├' if len(transaction.details) - 1 else '└',
-                            str(Value(detail.amount)),
                             ITEMS_INV[detail.item_id],
+                            str(Value(detail.amount)),
+                        )
+                )
+            transactions_msgs.append(
+                    '{} $ {:>10}/1 $ {:>12}'.format(
+                            '|' if len(transaction.details) - 1 else ' ',
+                            str(Value(detail.money / detail.amount)),
                             str(Value(detail.money)),
                         )
                 )

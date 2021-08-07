@@ -115,7 +115,10 @@ def conv_transaction_detail_add(update, context):
         return DETAIL
 
     try:
-        amount = Value(context.args[1])
+        if command == '/sell':
+            amount = Value(-abs(Value(context.args[1])))
+        elif command == '/buy':
+            amount = Value(abs(Value(context.args[1])))
     except (IndexError, ValueError):
         LOGGER.warning(
                 '%s: CONV add_transaction, CMD %s, incorrect amount',
@@ -143,9 +146,9 @@ def conv_transaction_detail_add(update, context):
         return DETAIL
 
     if command == '/sell':
-        price = amount * price
+        price = abs(amount * price)
     elif command == '/buy':
-        price = -(amount * price)
+        price = -abs(amount * price)
 
     context.user_data['transaction']['details'].append({
             'item_id': item_id,
@@ -177,7 +180,7 @@ def conv_transaction_detail_remove(update, context):
     """Remove transaction detail"""
     try:
         index = int(context.args[0]) - 1
-    except IndexError:
+    except (IndexError, ValueError):
         update.message.reply_text(
                 'geeft detail nummer te verwijderen '
                 'met: `/remove <index>`.',

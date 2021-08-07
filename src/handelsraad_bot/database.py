@@ -53,14 +53,23 @@ def remove_limit(item_id):
         session.commit()
 
 
-def get_transactions(limit=5):
+def get_transactions(limit=5, item_id=None):
     """Get transactions"""
     session = SESSION()
-    transactions = session.query(Transaction).options(
-            joinedload('details')
-        ).options(
-            joinedload('user')
-        ).order_by(Transaction.date_time.desc()).limit(limit).all()
+    if item_id:
+        transactions = session.query(Transaction).options(
+                joinedload('details')
+            ).options(
+                joinedload('user')
+            ).order_by(Transaction.date_time.desc()).filter(
+                Transaction.details.any(TransactionDetail.item_id == item_id)
+            ).limit(limit).all()
+    else:
+        transactions = session.query(Transaction).options(
+                joinedload('details')
+            ).options(
+                joinedload('user')
+            ).order_by(Transaction.date_time.desc()).limit(limit).all()
     session.expunge_all()
     session.close()
     return transactions
