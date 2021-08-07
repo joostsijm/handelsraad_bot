@@ -95,8 +95,7 @@ def remove_transaction(transaction_id):
     session = SESSION()
     transaction = session.query(Transaction).filter(
             Transaction.id == transaction_id
-        ).first()
-    session.delete(transaction)
+        ).delete()
     session.close()
 
 

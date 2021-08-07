@@ -23,19 +23,19 @@ def cmd_transactions(update, context):
         except ValueError:
             pass
     transactions = database.get_transactions(limit)
-    transactions_msgs = ['*Transacties:*', '```']
+    transactions_msgs = ['*Transacties:*']
     for transaction in transactions:
         transaction_total = 0
         transactions_msgs.append(
-                '{}: {} {} ({})'.format(
+                '*{}*: {} {} ({})'.format(
                         transaction.id,
                         transaction.date_time.strftime("%Y-%m-%d %H:%M"),
                         transaction.user.name,
                         transaction.user.telegram_username,
                     )
             )
+        transactions_msgs.append('```')
         transactions_msgs.append('├ {}'.format(transaction.description))
-        index = 1
         for detail in transaction.details:
             transactions_msgs.append(
                     '{} {:>8} {:10} $ {:>10}'.format(
@@ -46,12 +46,11 @@ def cmd_transactions(update, context):
                         )
                 )
             transaction_total += detail.money
-            index += 1
+        transactions_msgs.append('```')
         if len(transaction.details) - 1:
             transactions_msgs.append('└          totaal     $ {:>10}'.format(
                     str(Value(transaction_total))
                 ))
-    transactions_msgs.append('```')
     update.message.reply_text(
             '\n'.join(transactions_msgs), parse_mode=ParseMode.MARKDOWN
         )
@@ -69,7 +68,7 @@ def cmd_remove_transaction(update, context):
         return
     try:
         transaction_id = int(context.args[0])
-    except ValueError:
+    except (ValueError, IndexError):
         LOGGER.warning(
                 '%s: CMD remove transaction, incorrect <transaction_id>',
                 update.message.from_user.username,
