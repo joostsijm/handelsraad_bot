@@ -55,11 +55,11 @@ def cmd_transactions(update, context):
                         )
                 )
             transaction_total += detail.money
-        transactions_msgs.append('```')
         if len(transaction.details) - 1:
-            transactions_msgs.append('└          totaal     $ {:>10}'.format(
+            transactions_msgs.append('└         totaal $ {:>12}'.format(
                     str(Value(transaction_total))
                 ))
+        transactions_msgs.append('```')
     update.message.reply_text(
             '\n'.join(transactions_msgs), parse_mode=ParseMode.MARKDOWN
         )

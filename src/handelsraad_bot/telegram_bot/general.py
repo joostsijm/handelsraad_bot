@@ -55,18 +55,23 @@ def cmd_total(update, context):
     total_money = 0
     for item_id, item in total.items():
         total_msgs.append(
-                '{:3} $ {:>10} {:>6}/1 {:>10}'.format(
-                        ITEMS_INV[item_id][:3],
+                '{:12} {:>12}'.format(
+                        ITEMS_INV[item_id],
                         str(util.round_number(item['amount'], 10)),
-                        str(util.round_number(item['average'], 6)),
-                        str(util.round_number(item['amount'] * item['average'], 10))
+                    )
+            )
+        total_msgs.append(
+                '$ {:>10} $ {:>8}/1'.format(
+                        str(util.round_number(item['amount'] * item['average'], 10)),
+                        str(util.round_number(item['average'], 8)),
                     )
             )
         if item_id:
             total_money += item['amount'] * item['average']
         else:
             total_money += item['amount']
-    total_msgs.append('tot $ {:>10}'.format(str(util.round_number(total_money, 10))))
+    total_msgs.append('total')
+    total_msgs.append('$ {:>10}'.format(str(util.round_number(total_money, 10))))
     total_msgs.append('```')
     update.message.reply_text(
             '\n'.join(total_msgs), parse_mode=ParseMode.MARKDOWN
