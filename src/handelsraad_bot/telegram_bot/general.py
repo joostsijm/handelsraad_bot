@@ -55,13 +55,13 @@ def cmd_total(update, context):
     total_money = 0
     for item_id, item in total.items():
         total_msgs.append(
-                '{:12} {:>12}'.format(
+                '{:>12} {:>12}'.format(
                         ITEMS_INV[item_id],
                         str(util.round_number(item['amount'], 10)),
                     )
             )
         total_msgs.append(
-                '$ {:>10} $ {:>8}/1'.format(
+                '$ {:>10} $ {:>8}/1\n'.format(
                         str(util.round_number(item['amount'] * item['average'], 10)),
                         str(util.round_number(item['average'], 8)),
                     )
