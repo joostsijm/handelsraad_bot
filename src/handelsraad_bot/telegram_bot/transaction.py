@@ -49,7 +49,7 @@ def cmd_transactions(update, context):
                 )
             transactions_msgs.append(
                     '{} $ {:>10}/1 $ {:>12}'.format(
-                            '|' if len(transaction.details) - 1 else ' ',
+                            '│' if len(transaction.details) - 1 else ' ',
                             str(Value(detail.money / detail.amount)),
                             str(Value(detail.money)),
                         )
