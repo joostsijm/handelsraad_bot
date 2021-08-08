@@ -85,9 +85,9 @@ def get_total():
             money_total += detail.money
             item_total -= detail.amount
         if total[item_id]['amount']:
-            total[detail.item_id]['average'] = abs(round(
+            total[detail.item_id]['average'] = round(
                     money_total / total[item_id]['amount'], 2
-                ))
+                )
         else:
             del total[item_id]
 
