@@ -66,6 +66,7 @@ def get_total():
                     'amount': 0,
                     'average': 0
                 }
+        if detail.item_id not in item_details:
             item_details[detail.item_id] = []
         total[detail.item_id]['amount'] += detail.amount
         total[0]['amount'] += detail.money
